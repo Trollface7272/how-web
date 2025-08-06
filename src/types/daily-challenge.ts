@@ -1,8 +1,11 @@
-import { DailyChallengeUserData } from "./daily-challenge-profile"
-
 export interface GetDailyChallengeResponse {
     dailyChallenge: DailyChallengeData[]
-    dailyChallengeUser: DailyChallengeUserData[]
+    retentionData: RetentionData
+}
+
+export type RetentionData = {
+    total: Record<number, number>
+    country: Record<string, Record<number, number>>
 }
 
 export interface GetCurrentChallengeResponse {

@@ -3,7 +3,7 @@ import { DatePicker, Select, theme } from "antd";
 import { Line, LineChart, YAxis, Tooltip, XAxis, ResponsiveContainer, Legend, PieChart, Pie, Cell, getNiceTickValues } from "recharts";
 import { trpc } from "../../utils/trpc";
 import moment from "moment";
-import type { DailyChallengeData, GetDailyChallengeResponse } from "../../types/daily-challenge";
+import type { DailyChallengeData, GetDailyChallengeResponse, RetentionData } from "../../types/daily-challenge";
 import { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { modAcronyms } from "../../utils/osu";
@@ -188,22 +188,18 @@ const ModsChart = ({ data }: { data: DailyChallengeData[] }) => {
     )
 }
 
-const PlayerRetention = ({ data }: { data: DailyChallengeUserData[] }) => {
-    const participationData: Record<number, { count: number, participated: number, name: string }> = {}
-    const sorted = data.sort((a, b) => b.played.count - a.played.count)
+const PlayerRetention = ({ data }: { data: Record<number, number> }) => {
+    const participationData = useMemo(() => {
+        const ret: Record<number, { count: number, participated: number, name: string }> = {}
+        const to = Object.keys(data).reduce((acc, curr) => Math.max(acc, Number(curr)), 0)
+        const from = 1
 
-    const to = sorted[0].played.count
-    const from = sorted[sorted.length - 1].played.count
-
-    for (let i = from; i <= to; i++) {
-        if (!participationData[i]) participationData[i] = { count: 0, participated: i, name: `Participated ${i} times` }
-    }
-
-    sorted.forEach(item => {
-        participationData[item.played.count].count++
-    })
-
-    console.log(participationData)
+        for (let i = from; i <= to; i++) {
+            if (data[i]) ret[i] = { count: data[i], participated: i, name: `Participated ${i} times` }
+            else ret[i] = { count: 0, participated: i, name: `Participated ${i} times` }
+        }
+        return ret
+    }, [data])
 
     return (
         <ResponsiveContainer width={"100%"} height={400}>
@@ -211,7 +207,7 @@ const PlayerRetention = ({ data }: { data: DailyChallengeUserData[] }) => {
                 <Line type={"linear"} dataKey="count" dot={false} name={"Participation"} strokeWidth={1.2} />
                 <YAxis scale={"symlog"} diffuseConstant={1} ticks={[1, 10, 100, 1000, 10000, 100000]} />
                 <XAxis interval={9} />
-                <Tooltip labelFormatter={(label) => participationData[label+1]?.name ?? "unknown"} contentStyle={{ backgroundColor: "black" }} />
+                <Tooltip labelFormatter={(label) => participationData[label + 1]?.name ?? "unknown"} contentStyle={{ backgroundColor: "black" }} />
             </LineChart>
         </ResponsiveContainer>
     )
@@ -232,41 +228,19 @@ const DailyChallengeStats = () => {
             return ret
         })
 
-        const ids = dailyChallenge?.map(item => item.current_playlist_item.room_id) ?? []
-
-        const dailyChallengeUser = data?.dailyChallengeUser?.map(user => {
-            const player_rooms = user.played.rooms.filter(room => ids.includes(room))
-            const top10_rooms = user.top10Percent.rooms.filter(room => ids.includes(room))
-            const top50_rooms = user.top50Percent.rooms.filter(room => ids.includes(room))
-            const user_filtered: DailyChallengeUserData = {
-                country: user.country,
-                played: {
-                    rooms: player_rooms,
-                    count: player_rooms.length
-                },
-                top10Percent: {
-                    rooms: top10_rooms,
-                    count: top10_rooms.length
-                },
-                top50Percent: {
-                    rooms: top50_rooms,
-                    count: top50_rooms.length
-                }
-            }
-            return user_filtered
-        })
+        const retentionData = data?.retentionData?.total
 
         return {
-            dailyChallenge, dailyChallengeUser
+            dailyChallenge, retentionData
         }
     }, [data, filters])
 
     const filteredData = filtered?.dailyChallenge
-    const filteredUserData = filtered?.dailyChallengeUser
+    const retentionData = filtered?.retentionData
 
     if (isLoading) return <div>Loading...</div>
     if (isError) return <div>Error loading data</div>
-    if (!data || !filteredData || !filteredUserData) return <div>No data available</div>
+    if (!data || !filteredData || !retentionData) return <div>No data available</div>
 
     return (
         <>
@@ -284,12 +258,10 @@ const DailyChallengeStats = () => {
             </Container>
 
             <Container title="Player Retention">
-                <PlayerRetention data={filteredUserData} />
+                <PlayerRetention data={retentionData} />
             </Container>
         </>
     )
 }
-
-export const dynamic = "force-dynamic"
 
 export default DailyChallengeStats

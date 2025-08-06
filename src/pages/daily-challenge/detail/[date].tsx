@@ -17,13 +17,13 @@ import { trpc } from "../../../utils/trpc"
 
 const DailyChallengePicker = () => {
     const router = useRouter()
-    let { date } = router.query
+    let { date } = router?.query || { date: null }
     if (date === "current") date = dayjs().format("YYYY-MM-DD")
 
     return (
         <DatePicker style={{ padding: 8 }} defaultValue={dayjs(date as string, "YYYY-MM-DD")} format="YYYY-MM-DD" onChange={(d) => {
             if (d) {
-                router.push(`/daily-challenge/detail/${d.format("YYYY-MM-DD")}`)
+                router?.push(`/daily-challenge/detail/${d.format("YYYY-MM-DD")}`)
             }
         }} />
     )
@@ -138,7 +138,7 @@ const ThresholdsGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
 
 const DailyChallengeCurrent = () => {
     const router = useRouter()
-    const { date } = router.query
+    const { date } = router?.query || { date: null }
     const { data, isLoading, isError } = trpc.dailyChallenge.getDailyChallenge.useQuery({ date: date === "current" ? undefined : date as string })
     const { token } = theme.useToken()
 

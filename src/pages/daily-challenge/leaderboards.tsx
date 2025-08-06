@@ -83,6 +83,4 @@ const Leaderboards = () => {
     )
 }
 
-export const dynamic = "force-dynamic"
-
 export default Leaderboards
