@@ -168,6 +168,4 @@ const DailyChallengeCurrent = () => {
     )
 }
 
-export const dynamic = "force-dynamic"
-
 export default DailyChallengeCurrent

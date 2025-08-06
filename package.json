@@ -11,7 +11,6 @@
   "dependencies": {
     "@ant-design/dark-theme": "^2.0.2",
     "@ant-design/icons": "^6.0.0",
-    "@next/font": "13.1.1",
     "@tanstack/react-query": "^4.20.4",
     "@trpc/client": "^10.7.0",
     "@trpc/next": "^10.7.0",
@@ -29,7 +28,7 @@
     "moment-range": "^4.0.2",
     "mongodb": "^4.13.0",
     "mongoose": "^6.8.1",
-    "next": "13.1.1",
+    "next": "15.4.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-world-flags": "^1.6.0",
