@@ -289,5 +289,6 @@ const DailyChallengeStats = () => {
     )
 }
 
+export const dynamic = "force-dynamic"
 
 export default DailyChallengeStats

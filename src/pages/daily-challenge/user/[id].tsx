@@ -140,5 +140,6 @@ const User = () => {
     )
 }
 
+export const dynamic = "force-dynamic"
 
 export default User
