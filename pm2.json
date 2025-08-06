@@ -1,0 +1,9 @@
+{
+    "apps": [
+        {
+            "name": "daily-challenge-server",
+            "script": "pnpm",
+            "args": "run start"
+        }
+    ]
+}
