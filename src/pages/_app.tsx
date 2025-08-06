@@ -15,7 +15,7 @@ import { trpc } from "../utils/trpc";
 import Link from "next/link";
 import { usePathname } from "next/navigation"
 import { IClientUser, IUser } from "../models/user.model";
-import { UserContext } from "../context.ts/User";
+import { UserContext } from "../context/User";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
