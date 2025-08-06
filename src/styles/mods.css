@@ -1,0 +1,467 @@
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css");
+
+:root {
+    --mod-height: 1em;
+    --hsl-lime-1: 90, 100%, 70%;
+    --hsl-red-1: 360, 100%, 70%;
+    --hsl-purple-1: 255, 100%, 70%;
+    --hsl-blue-1: 200, 100%, 70%;
+    --hsl-pink-1: 333, 100%, 70%;
+}
+
+.mod {
+    font-size: var(--mod-height, );
+    height: 1em;
+    display: flex;
+    position: relative;
+}
+
+.mod--type-Automation {
+    --type-bg-colour: hsl(var(--hsl-blue-1));
+    --type-fg-colour: 
+ color-mix(in srgb-linear, #000, hsl(var(--hsl-blue-1)) 10%);
+    --type-extender-colour: 
+ color-mix(in srgb, #000, hsl(var(--hsl-blue-1)) 26.3%);
+}
+
+.mod--type-Conversion {
+    --type-bg-colour: hsl(var(--hsl-purple-1));
+    --type-fg-colour: 
+ color-mix(in srgb-linear, #000, hsl(var(--hsl-purple-1)) 10%);
+    --type-extender-colour: 
+ color-mix(in srgb, #000, hsl(var(--hsl-purple-1)) 26.3%);
+}
+
+.mod--type-DifficultyIncrease {
+    --type-bg-colour: hsl(var(--hsl-red-1));
+    --type-fg-colour:
+        color-mix(in srgb-linear, #000, hsl(var(--hsl-red-1)) 10%);
+    --type-extender-colour:
+        color-mix(in srgb, #000, hsl(var(--hsl-red-1)) 26.3%);
+}
+
+.mod--type-DifficultyReduction {
+    --type-bg-colour: hsl(var(--hsl-lime-1));
+    --type-fg-colour: color-mix(in srgb-linear, #000, hsl(var(--hsl-lime-1)) 10%);
+    --type-extender-colour: color-mix(in srgb, #000, hsl(var(--hsl-lime-1)) 26.3%);
+}
+
+.mod--type-Fun {
+    --type-bg-colour: hsl(var(--hsl-pink-1));
+    --type-fg-colour: 
+ color-mix(in srgb-linear, #000, hsl(var(--hsl-pink-1)) 10%);
+    --type-extender-colour: 
+ color-mix(in srgb, #000, hsl(var(--hsl-pink-1)) 26.3%);
+}
+
+.mod--type-System {
+    --type-bg-colour: #fc2;
+    --type-fg-colour:
+        color-mix(in srgb-linear, #000, #fc2 10%);
+    --type-extender-colour:
+        color-mix(in srgb, #000, #fc2 26.3%);
+}
+
+.mod__icon {
+    position: relative;
+    width: 1.42em;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.mod__icon::before,
+.mod__icon::after {
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.mod__icon::before {
+    background-color: var(--type-bg-colour);
+    mask-image: url("/images/mods/mod-icon.svg");
+    mask-size: contain;
+    mask-position: center;
+    mask-repeat: no-repeat;
+    content: " ";
+    display: flex;
+}
+
+.mod__icon::after {
+    content: attr(data-acronym);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--type-fg-colour);
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 0.4em;
+}
+
+.mod__icon--AP::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/autopilot.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+    z-index: 1;
+}
+
+.mod__icon--AT::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/autoplay.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--CN::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/cinema.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--DT::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/double-time.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--EZ::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/easy.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--FL::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/flashlight.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--HT::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/half-time.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--HR::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/hard-rock.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--HD::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/hidden.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--NC::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/  .svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--NF::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/no-fail.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--PF::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/perfect.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--RD::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/random.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--RX::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/relax.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--SD::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/sudden-death.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--SO::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/spun-out.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--TD::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/touch-device.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--TP::after {
+    content: "";
+    background-color: var(--type-fg-colour);
+    mask-image: url("/images/mods/target-practice.svg");
+    mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    margin: 0;
+}
+
+.mod__icon--AD::after {
+    display: flex;
+    content: "\f111";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--AL::after {
+    display: flex;
+    content: "\f11c";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--BL::after {
+    display: flex;
+    content: "BM";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--CL::after {
+    display: flex;
+    content: "\f1da";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--CS::after {
+    display: flex;
+    content: "CS";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--DA::after {
+    display: flex;
+    content: "\f6e3";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--DF::after {
+    display: flex;
+    content: "\f78c";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--DP::after {
+    display: flex;
+    content: "\f1b2";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--FF::after {
+    display: flex;
+    content: "FF";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--GR::after {
+    display: flex;
+    content: "\f338";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--HO::after {
+    display: flex;
+    content: "HO";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--IN::after {
+    display: flex;
+    content: "IN";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--NM::after {
+    display: flex;
+    content: "\f05e";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--NS::after {
+    display: flex;
+    content: "\f070";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--MG::after {
+    display: flex;
+    content: "\f076";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--MU::after {
+    display: flex;
+    content: "\f6a9";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--SI::after {
+    display: flex;
+    content: "\f0e2";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--TR::after {
+    display: flex;
+    content: "TC";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--WD::after {
+    display: flex;
+    content: "\f13a";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--WG::after {
+    display: flex;
+    content: "\f0a3";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__icon--WU::after {
+    display: flex;
+    content: "\f139";
+    font-size: 0.8em;
+    padding-left: 1px;
+}
+
+.mod__customised-indicator {
+    width: 0.35em;
+    height: 0.35em;
+    border-radius: 50%;
+    background-color: var(--type-fg-colour);
+    position: absolute;
+    left: 1.05em;
+    top: -0.125em;
+}
+
+.mod__customised-indicator::after {
+    content: "CI";
+    color: var(--type-bg-colour);
+    font-size: 0.2em;
+}
+
+.mod__extender {
+    width: 2.2em;
+    background-color: var(--type-extender-colour);
+    mask-image: url("/images/mods/mod-icon-extender.svg");
+    mask-size: contain;
+    mask-position: center;
+    mask-repeat: no-repeat;
+    margin-left: -0.5em;
+    padding-left: 0.5em;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--type-bg-colour);
+    padding-right: 3px;
+    padding-bottom: 1px;
+}
+
+.mod__extender span {
+    font-size: 0.5em;
+}
