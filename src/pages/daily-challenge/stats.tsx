@@ -1,3 +1,4 @@
+"use client"
 import { DatePicker, Select, theme } from "antd";
 import { Line, LineChart, YAxis, Tooltip, XAxis, ResponsiveContainer, Legend, PieChart, Pie, Cell, getNiceTickValues } from "recharts";
 import { trpc } from "../../utils/trpc";

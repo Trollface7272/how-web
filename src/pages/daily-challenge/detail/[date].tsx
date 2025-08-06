@@ -1,3 +1,4 @@
+"use client"
 import { DatePicker, theme } from "antd"
 import dayjs from "dayjs"
 import moment from "moment"

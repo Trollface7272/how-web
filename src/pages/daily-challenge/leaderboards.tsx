@@ -1,3 +1,4 @@
+"use client"
 import { Input, Select, Spin, Table, TablePaginationConfig } from "antd"
 import { useMemo, useState } from "react"
 import { Container } from "../../components/GraphContainer"

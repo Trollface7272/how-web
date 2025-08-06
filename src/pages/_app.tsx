@@ -1,37 +1,15 @@
 import "../styles/globals.css";
 import "../styles/mods.css";
 import type { AppProps } from "next/app";
-import Image from "next/image";
-
 import { Avatar, ConfigProvider, Layout, Menu, theme } from "antd";
-import { createContext, useContext, useState } from "react";
-import type { MenuProps } from "antd";
-import {
-    UserOutlined,
-    LoginOutlined
-} from "@ant-design/icons";
+import { useContext, useState } from "react";
+import { LoginOutlined } from "@ant-design/icons";
 const { Content, Sider } = Layout;
 import { trpc } from "../utils/trpc";
 import Link from "next/link";
 import { usePathname } from "next/navigation"
-import { IClientUser, IUser } from "../models/user.model";
+import { IClientUser } from "../models/user.model";
 import { UserContext } from "../context/User";
-
-type MenuItem = Required<MenuProps>["items"][number];
-
-function getItem(
-    label: React.ReactNode,
-    key: React.Key,
-    icon?: React.ReactNode,
-    children?: MenuItem[]
-): MenuItem {
-    return {
-        key,
-        icon,
-        children,
-        label,
-    } as MenuItem;
-}
 
 const LoginButton = () => {
     return (
