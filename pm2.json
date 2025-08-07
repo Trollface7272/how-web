@@ -1,7 +1,7 @@
 {
     "apps": [
         {
-            "name": "daily-challenge-server",
+            "name": "how-web",
             "script": "pnpm",
             "args": "run start"
         }
