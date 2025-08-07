@@ -7,6 +7,7 @@ const dbConnect = async () => {
   }
   const uri = process.env.MONGODB_URI;
   await mongoose.connect(uri);
+  mongoose.set("strictQuery", false);
   cache.init(mongoose, {
     engine: "memory"
   })
