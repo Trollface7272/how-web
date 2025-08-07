@@ -8,6 +8,7 @@ import Image from "next/image"
 import { useRouter } from "next/router"
 import { debounce } from "../../utils/helpers"
 import { SearchSelectUserRow } from "../../components/SearchSelectUserRow"
+import { Loading } from "../../components/Loading"
 
 const PER_PAGE = 10
 
@@ -39,7 +40,7 @@ const Leaderboards = () => {
         })) || []
     }, [data, page])
 
-    if (isLoading) return <div>Loading...</div>
+    if (isLoading) return <Loading fullPage />
     if (isError) return <div>Error loading leaderboards</div>
     if (!data) return <div>No data</div>
 

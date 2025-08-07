@@ -8,6 +8,7 @@ import { useState } from "react"
 import { Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { Box } from "../../../components/Box"
 import { Container } from "../../../components/GraphContainer"
+import { Loading } from "../../../components/Loading"
 import { Mod } from "../../../components/Mod"
 import { Row } from "../../../components/Row"
 import { Beatmap, Thresholds } from "../../../types/daily-challenge"
@@ -140,9 +141,8 @@ const DailyChallengeCurrent = () => {
     const router = useRouter()
     const { date } = router?.query || { date: null }
     const { data, isLoading, isError } = trpc.dailyChallenge.getDailyChallenge.useQuery({ date: date === "current" ? undefined : date as string })
-    const { token } = theme.useToken()
 
-    if (isLoading) return <div>Loading...</div>
+    if (isLoading) return <Loading fullPage />
     if (isError) return <div>Error</div>
     if (!data) return <div>No data</div>
 

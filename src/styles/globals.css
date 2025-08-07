@@ -32,6 +32,23 @@
   --callout-border-rgb: 172, 175, 176;
   --card-rgb: 180, 185, 188;
   --card-border-rgb: 131, 134, 135;
+
+  --gold: #ffe600;
+  --silver: silver;
+  --bronze: #cd7f32;
+  --iron: #a28c71;
+  --purple: #ed82ff;
+  --blue: #97dcff;
+
+  --lustrous-gradient: linear-gradient(#ffe600, var(--purple));
+  --radiant-gradient: linear-gradient(var(--blue), var(--purple));
+  
+  --color-rank-1: var(--lustrous-gradient);
+  --color-top-1: var(--radiant-gradient);
+  --color-top-10: var(--gold);
+  --color-top-50: var(--silver);
+  --color-top-75: var(--bronze);
+  --color-top-100: var(--iron);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -72,7 +89,7 @@
 html,
 body {
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 body {

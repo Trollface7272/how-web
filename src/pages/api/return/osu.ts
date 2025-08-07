@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const osuUser = await osuUserRequest.json()
 
     const user = (await userModel()
-        .findOne(state ? { osuTemp: state } : { osuId: osuUser.id })
+        .findOne(state ? { osuTemp: state } : { "osu.userId": osuUser.id })
         .exec())!
 
     user.osu = {
@@ -59,7 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const session_token = randomBytes(32).toString("hex")
-    const ip = (req.headers["x-forwarded-for"] as string|undefined) ?? req.socket.remoteAddress
+    const ip = (req.headers["x-forwarded-for"] as string | undefined) ?? req.socket.remoteAddress
     const session = await sessionModel()
         .create({
             userId: user.id,

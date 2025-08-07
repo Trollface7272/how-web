@@ -110,9 +110,12 @@ export interface ModData {
 
 export interface Thresholds {
     date: string
-    top10: ThresholdsPlacement
-    top50: ThresholdsPlacement
     rank1: ThresholdsPlacement
+    top1: ThresholdsPlacement
+    top10: ThresholdsPlacement
+    top25: ThresholdsPlacement
+    top50: ThresholdsPlacement
+    top75: ThresholdsPlacement
     total: number
 }
 

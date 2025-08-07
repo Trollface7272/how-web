@@ -148,6 +148,7 @@ const modConfig = {
 
 export const Mod = ({ mod }: { mod: IMod }) => {
     const conf = modConfig[mod.acronym as keyof typeof modConfig]
+    if (!conf) return <></>
     return (
         <Tooltip title={modAcronyms[mod.acronym as keyof typeof modAcronyms]}>
             <div className={`mod mod--type-${conf.type}`}>

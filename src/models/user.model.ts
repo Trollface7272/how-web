@@ -31,7 +31,11 @@ export interface IUser {
     }
 }
 
-export type IClientUser = Pick<IUser, "id" | "username"> & { osu?: { username: string, userId: number } }
+export type IClientUser = Partial<Pick<IUser, "id" | "username">> & { osu?: { username: string, userId: number } }
+
+export type IUserContext = IClientUser & {
+    refetch: () => Promise<void>
+}
 
 const userSchema = new Schema<IUser>({
     id: {

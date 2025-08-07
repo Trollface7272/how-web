@@ -2,14 +2,16 @@ import "../styles/globals.css";
 import "../styles/mods.css";
 import type { AppProps } from "next/app";
 import { Avatar, ConfigProvider, Layout, Menu, theme } from "antd";
-import { useContext, useState } from "react";
-import { LoginOutlined } from "@ant-design/icons";
+import { useContext, useEffect, useState } from "react";
+import { LoginOutlined, LogoutOutlined } from "@ant-design/icons";
 const { Content, Sider } = Layout;
 import { trpc } from "../utils/trpc";
 import Link from "next/link";
 import { usePathname } from "next/navigation"
-import { IClientUser } from "../models/user.model";
+import { IUserContext } from "../models/user.model";
 import { UserContext } from "../context/User";
+import { Row } from "../components/Row";
+import { deleteCookie } from "cookies-next/client"
 
 const LoginButton = () => {
     return (
@@ -22,13 +24,20 @@ const LoginButton = () => {
     )
 }
 const ProfileButton = () => {
-    const user = useContext<IClientUser | null>(UserContext)!
+    const user = useContext<IUserContext | null>(UserContext)!
     return (
-        <Menu.Item key="logged-user">
-            <Link href={"/profile"} style={{ width: "100%", height: "100%", display: "flex", alignItems: "center" }}>
-                <Avatar style={{ marginLeft: 18, height: 24, width: 24 }} alt="Avatar" src={`https://a.ppy.sh/${user.osu?.userId}`} />
-                <span style={{ fontSize: 14, marginLeft: 5 }}>{user.osu?.username}</span>
-            </Link>
+        <Menu.Item key={`/daily-challenge/user/${user.osu?.userId}`}>
+            <Row>
+                <Link href={`/daily-challenge/user/${user.osu?.userId}`} style={{ width: "100%", height: "100%", display: "flex", alignItems: "center" }}>
+                    <Avatar style={{ marginLeft: 18, height: 24, width: 24 }} alt="Avatar" src={`https://a.ppy.sh/${user.osu?.userId}`} />
+                    <span style={{ fontSize: 14, marginLeft: 5 }}>{user.osu?.username}</span>
+                </Link>
+                <LogoutOutlined style={{ zIndex: 1000 }} onClick={async (e) => {
+                    e.stopPropagation()
+                    await fetch("/api/logout")
+                    user.refetch()
+                }} />
+            </Row>
         </Menu.Item>
     )
 }
@@ -37,7 +46,7 @@ const ProfileButton = () => {
 const SideMenu = () => {
     const href = usePathname() ?? ""
     const [collapsed, setCollapsed] = useState(false);
-    const user = useContext<IClientUser | null>(UserContext)
+    const user = useContext<IUserContext | null>(UserContext)
 
     return (
         <Sider
@@ -53,7 +62,7 @@ const SideMenu = () => {
                 mode="inline"
                 style={{ minHeight: "100vh" }}
             >
-                {user ? <ProfileButton /> : <LoginButton />}
+                {user?.id ? <ProfileButton /> : <LoginButton />}
                 <Menu.SubMenu key={"daily-challenge-group"} title="Daily challenge">
                     <Menu.Item key="/daily-challenge/stats">
                         <Link href="/daily-challenge/stats">
@@ -77,7 +86,7 @@ const SideMenu = () => {
 }
 
 const App = ({ Component, pageProps }: AppProps) => {
-    const { data: user } = trpc.user.getLoggedUser.useQuery()
+    const { data: user, refetch: _refetch } = trpc.user.getLoggedUser.useQuery()
     const t = {
         algorithm: theme.darkAlgorithm,
         token: {
@@ -85,8 +94,23 @@ const App = ({ Component, pageProps }: AppProps) => {
         }
     }
 
+    const refetch = async () => { _refetch() }
+
+    if (typeof window !== 'undefined') {
+        window.onload = () => {
+            document.getElementById('holderStyle')!.remove();
+        };
+    }
+
+    useEffect(() => {
+        document.getElementById('holderStyle')?.remove();
+    })
+
     return (
-        <UserContext.Provider value={user ?? null}>
+        <UserContext.Provider value={user ? {
+            ...user,
+            refetch
+        } : { refetch }}>
             <ConfigProvider theme={t} >
                 <Layout style={{ minHeight: "100vh" }}>
 

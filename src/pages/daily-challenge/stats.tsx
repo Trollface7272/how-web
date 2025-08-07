@@ -1,15 +1,17 @@
 "use client"
 import { DatePicker, Select, theme } from "antd";
-import { Line, LineChart, YAxis, Tooltip, XAxis, ResponsiveContainer, Legend, PieChart, Pie, Cell, getNiceTickValues } from "recharts";
+import { Line, LineChart, YAxis, Tooltip, XAxis, ResponsiveContainer, Legend, PieChart, Pie, Cell } from "recharts";
 import { trpc } from "../../utils/trpc";
 import moment from "moment";
-import type { DailyChallengeData, GetDailyChallengeResponse, RetentionData } from "../../types/daily-challenge";
+import type { DailyChallengeData } from "../../types/daily-challenge";
 import { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { modAcronyms } from "../../utils/osu";
-import { DailyChallengeUserData } from "../../types/daily-challenge-profile";
-import { scaleSymlog } from "d3-scale";
 import { Container } from "../../components/GraphContainer";
+import { Row } from "../../components/Row";
+import { Loading } from "../../components/Loading";
+import { PieLabelProps } from "recharts/types/polar/Pie";
+import { Mod } from "../../components/Mod";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d", "#a4de6c", "#d0ed57", "#ffc658", "#ff6b6b", "#90e0ef", "#00b4d8", "#007bff", "#0056b3", "#003d80", "#002650"]
 
@@ -22,7 +24,7 @@ type Filters = {
 type ModsData = {
     forced: {
         single: {
-            [key: string]: { name: string, value: number }
+            [key: string]: { name: string, value: number, acronym: string }
         }
         combinations: {
             [key: string]: { name: string, value: number }
@@ -30,7 +32,7 @@ type ModsData = {
     }
     used: {
         single: {
-            [key: string]: { name: string, value: number }
+            [key: string]: { name: string, value: number, acronym: string }
         }
         combinations: {
             [key: string]: { name: string, value: number }
@@ -51,7 +53,7 @@ const Filters = ({ filters, setFilters }: { filters: Filters, setFilters: (filte
                     options={["All", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(item => ({ label: item, value: item }))}
                     value={filters?.weekday}
                     onChange={(value) => setFilters({ ...filters, weekday: value })}
-                    style={{ width: 115, textAlign: "center" }}
+                    style={{ width: 140, textAlign: "center" }}
                 />
             </div>
         </div>
@@ -59,7 +61,6 @@ const Filters = ({ filters, setFilters }: { filters: Filters, setFilters: (filte
 }
 
 const ParticipationChart = ({ data }: { data: DailyChallengeData[] }) => {
-    const { token } = theme.useToken()
     const participationData = data.map(item => ({
         name: moment(item.starts_at).format("DD MMM YYYY"),
         total: item.total,
@@ -77,23 +78,38 @@ const ParticipationChart = ({ data }: { data: DailyChallengeData[] }) => {
 }
 
 const PlacementChart = ({ data }: { data: DailyChallengeData[] }) => {
+    const [hidden, setHidden] = useState<string[]>(["top1", "top25", "top75"])
+
+    const handleLegendClick = (dataKey: string) => {
+        if (hidden.includes(dataKey)) {
+            setHidden(prev => prev.filter(key => key !== dataKey))
+        } else {
+            setHidden(prev => [...prev, dataKey])
+        }
+    }
     const placementData = data.map(item => ({
         name: moment(item.starts_at).format("DD MMM YYYY"),
-        top1: item.thresholds?.rank1?.score || 0,
+        rank1: item.thresholds?.rank1?.score || 0,
+        top1: item.thresholds?.top1?.score || 0,
         top10: item.thresholds?.top10?.score || 0,
+        top25: item.thresholds?.top25?.score || 0,
         top50: item.thresholds?.top50?.score || 0,
+        top75: item.thresholds?.top75?.score || 0,
     }))
 
     return (
         <ResponsiveContainer width={"100%"} height={400}>
             <LineChart data={placementData}>
-                <Line type={"basis"} dataKey="top1" dot={false} name={"Rank 1"} stroke="yellow" strokeWidth={1.2} />
-                <Line type={"basis"} dataKey="top10" dot={false} name={"Top 10%"} stroke="silver" strokeWidth={1.2} />
-                <Line type={"basis"} dataKey="top50" dot={false} name={"Top 50%"} stroke="#CD7F32" strokeWidth={1.2} />
+                <Line type={"basis"} hide={hidden.includes("rank1")} dataKey="rank1" dot={false} name={"Rank 1"} stroke="var(--gold)" strokeWidth={1.2} />
+                <Line type={"basis"} hide={hidden.includes("top1")} dataKey="top1" dot={false} name={"Top 1%"} stroke="var(--purple)" strokeWidth={1.2} />
+                <Line type={"basis"} hide={hidden.includes("top10")} dataKey="top10" dot={false} name={"Top 10%"} stroke="var(--silver)" strokeWidth={1.2} />
+                <Line type={"basis"} hide={hidden.includes("top25")} dataKey="top25" dot={false} name={"Top 25%"} stroke="var(--blue)" strokeWidth={1.2} />
+                <Line type={"basis"} hide={hidden.includes("top50")} dataKey="top50" dot={false} name={"Top 50%"} stroke="var(--bronze)" strokeWidth={1.2} />
+                <Line type={"basis"} hide={hidden.includes("top75")} dataKey="top75" dot={false} name={"Top 75%"} stroke="var(--iron)" strokeWidth={1.2} />
                 <YAxis />
                 <Tooltip contentStyle={{ backgroundColor: "black" }} formatter={(num) => num.toLocaleString()} />
                 <XAxis dataKey="name" minTickGap={20} />
-                <Legend />
+                <Legend formatter={(value, entry) => (<span style={{ color: entry.inactive ? "gray" : entry?.color }}>{value}</span>)} onClick={props => handleLegendClick(props.dataKey as string)} />
             </LineChart>
         </ResponsiveContainer>
     )
@@ -108,7 +124,6 @@ const ModsChart = ({ data }: { data: DailyChallengeData[] }) => {
             single: {}, combinations: {}
         }
     }
-    const { token } = theme.useToken()
     data.forEach(item => {
         const forcedMods = item.current_playlist_item.required_mods
         if (forcedMods.length === 0) return
@@ -116,7 +131,7 @@ const ModsChart = ({ data }: { data: DailyChallengeData[] }) => {
         forcedMods.forEach(mod => {
             if (!modAcronyms[mod.acronym as keyof typeof modAcronyms]) console.log(mod.acronym)
             if (modsData.forced.single[mod.acronym]) modsData.forced.single[mod.acronym].value++
-            else modsData.forced.single[mod.acronym] = { name: modAcronyms[mod.acronym as keyof typeof modAcronyms], value: 1 }
+            else modsData.forced.single[mod.acronym] = { name: modAcronyms[mod.acronym as keyof typeof modAcronyms], value: 1, acronym: mod.acronym }
             combo += mod.acronym
         })
         if (modsData.forced.combinations[combo]) modsData.forced.combinations[combo].value++
@@ -124,7 +139,7 @@ const ModsChart = ({ data }: { data: DailyChallengeData[] }) => {
         const usedMods = item.modData
         Object.keys(usedMods?.single ?? []).forEach(mod => {
             if (modsData.used.single[mod]) modsData.used.single[mod].value += usedMods.single[mod].total
-            else modsData.used.single[mod] = { name: modAcronyms[mod as keyof typeof modAcronyms], value: 1 }
+            else modsData.used.single[mod] = { name: modAcronyms[mod as keyof typeof modAcronyms], value: 1, acronym: mod }
         })
         Object.keys(usedMods?.combinations ?? []).forEach(combo => {
             if (modsData.used.combinations[combo]) modsData.used.combinations[combo].value += usedMods.combinations[combo].total
@@ -142,49 +157,67 @@ const ModsChart = ({ data }: { data: DailyChallengeData[] }) => {
     const allUsedCombinationsData = Object.values(modsData.used.combinations).sort((a, b) => b.value - a.value)
     const usedCombinationsData = [...allUsedCombinationsData.slice(0, 15), allUsedCombinationsData.slice(15).reduce((acc, curr) => { acc.value += curr.value; return acc }, { name: "Other", value: 0 })]
 
+    const RADIAN = Math.PI / 180
+
     return (
-        <div style={{ display: "flex", gap: 16 }}>
-            <ResponsiveContainer width={"25%"} height={400}>
-                <PieChart>
-                    <Pie data={singleData} dataKey="value" nameKey="name" outerRadius={180} stroke="none">
-                        {singleData.map((el, i) =>
-                            <Cell key={el.name} fill={COLORS[i]} name={el.name} />)
-                        }
-                    </Pie>
-                    <Tooltip />
-                </PieChart>
-            </ResponsiveContainer >
-            <ResponsiveContainer width={"25%"} height={400}>
-                <PieChart>
-                    <Pie data={combinationsData} dataKey="value" nameKey="name" outerRadius={180} stroke="none">
-                        {combinationsData.map((el, i) =>
-                            <Cell key={el.name} fill={COLORS[i]} name={el.name} />)
-                        }
-                    </Pie>
-                    <Tooltip />
-                </PieChart>
-            </ResponsiveContainer>
-            <ResponsiveContainer width={"25%"} height={400}>
-                <PieChart>
-                    <Pie data={usedSingleData} dataKey="value" nameKey="name" outerRadius={180} stroke="none">
-                        {usedSingleData.map((el, i) =>
-                            <Cell key={el.name} fill={COLORS[i]} name={el.name} />)
-                        }
-                    </Pie>
-                    <Tooltip />
-                </PieChart>
-            </ResponsiveContainer>
-            <ResponsiveContainer width={"25%"} height={400}>
-                <PieChart>
-                    <Pie data={usedCombinationsData} dataKey="value" nameKey="name" outerRadius={180} stroke="none">
-                        {usedCombinationsData.map((el, i) =>
-                            <Cell key={el.name} fill={COLORS[i]} name={el.name} />)
-                        }
-                    </Pie>
-                    <Tooltip />
-                </PieChart>
-            </ResponsiveContainer>
-        </div>
+        <>
+            <Row>
+                <div style={{ width: "25%", fontSize: 18, fontWeight: "bold" }}>
+                    Forced Mods
+                </div>
+                <div style={{ width: "25%", fontSize: 18, fontWeight: "bold" }}>
+                    Forced Mod Combinations
+                </div>
+                <div style={{ width: "25%", fontSize: 18, fontWeight: "bold" }}>
+                    Used Mods
+                </div>
+                <div style={{ width: "25%", fontSize: 18, fontWeight: "bold" }}>
+                    Used Mod Combinations
+                </div>
+            </Row>
+            <div style={{ display: "flex", gap: 16 }}>
+                <ResponsiveContainer width={"25%"} height={400}>
+                    <PieChart>
+                        <Pie data={singleData} dataKey="value" nameKey="name" outerRadius={180} stroke="none">
+                            {singleData.map((el, i) =>
+                                <Cell key={el.name} fill={COLORS[i]} name={el.name} />)
+                            }
+                        </Pie>
+                        <Tooltip />
+                    </PieChart>
+                </ResponsiveContainer >
+                <ResponsiveContainer width={"25%"} height={400}>
+                    <PieChart>
+                        <Pie data={combinationsData} dataKey="value" nameKey="name" outerRadius={180} stroke="none">
+                            {combinationsData.map((el, i) =>
+                                <Cell key={el.name} fill={COLORS[i]} name={el.name} />)
+                            }
+                        </Pie>
+                        <Tooltip />
+                    </PieChart>
+                </ResponsiveContainer>
+                <ResponsiveContainer width={"25%"} height={400}>
+                    <PieChart>
+                        <Pie data={usedSingleData} dataKey="value" nameKey="name" outerRadius={180} stroke="none">
+                            {usedSingleData.map((el, i) =>
+                                <Cell key={el.name} fill={COLORS[i]} name={el.name} />)
+                            }
+                        </Pie>
+                        <Tooltip />
+                    </PieChart>
+                </ResponsiveContainer>
+                <ResponsiveContainer width={"25%"} height={400}>
+                    <PieChart>
+                        <Pie data={usedCombinationsData} dataKey="value" nameKey="name" outerRadius={180} stroke="none">
+                            {usedCombinationsData.map((el, i) =>
+                                <Cell key={el.name} fill={COLORS[i]} name={el.name} />)
+                            }
+                        </Pie>
+                        <Tooltip />
+                    </PieChart>
+                </ResponsiveContainer>
+            </div>
+        </>
     )
 }
 
@@ -238,7 +271,7 @@ const DailyChallengeStats = () => {
     const filteredData = filtered?.dailyChallenge
     const retentionData = filtered?.retentionData
 
-    if (isLoading) return <div>Loading...</div>
+    if (isLoading) return <Loading fullPage />
     if (isError) return <div>Error loading data</div>
     if (!data || !filteredData || !retentionData) return <div>No data available</div>
 

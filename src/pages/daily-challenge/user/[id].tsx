@@ -8,20 +8,26 @@ import { trpc } from "../../../utils/trpc"
 import { GetUserResponse } from "../../../types/daily-challenge"
 import { Line, LineChart, ResponsiveContainer, YAxis, XAxis, Tooltip } from "recharts"
 import { useMemo } from "react"
+import { Loading } from "../../../components/Loading"
+
 
 const legendData = [
-    { color: "gold", label: "Rank 1" },
-    { color: "#b0b0b0", label: "Top 10%" },
-    { color: "#CD7F32", label: "Top 50%" },
-    { color: "green", label: "Participated" },
-    { color: "gray", label: "Not participated" }
+    { color: "var(--lustrous-gradient)", label: "Rank 1" },
+    { color: "var(--radiant-gradient)", label: "Top 1%" },
+    { color: "var(--gold)", label: "Top 10%" },
+    { color: "var(--silver)", label: "Top 50%" },
+    { color: "var(--bronze", label: "Top 75%" },
+    { color: "var(--iron)", label: "Participated" },
+    { color: "#505050", label: "Not participated" }
 ]
 
 const placementToColor = (placement: number, placementPercent: number) => {
-    if (placement === 1) return "gold"
-    if (placementPercent <= 10) return "#b0b0b0"
-    if (placementPercent <= 50) return "#CD7F32"
-    return "green"
+    if (placement === 1) return legendData[0].color
+    if (placementPercent <= 1) return legendData[1].color
+    if (placementPercent <= 10) return legendData[2].color
+    if (placementPercent <= 50) return legendData[3].color
+    if (placementPercent <= 75) return legendData[4].color
+    return legendData[5].color
 }
 
 const CellTooltip = ({ placement, placementPercent, score, date }: { placement: number, placementPercent: number, score: number, date: string }) => {
@@ -47,7 +53,7 @@ const Participation = ({ scores }: { scores: GetUserResponse["scoreData"] }) => 
         CellData: cellData
     }
     return (
-        <Matrix data={matrixData} legendData={legendData} defaultColor="gray" />
+        <Matrix data={matrixData} legendData={legendData} defaultColor={legendData.at(-1)!.color} />
     )
 }
 
@@ -56,8 +62,6 @@ const Score = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
         return scores.map(score => {
             return {
                 score: score.score,
-                placement: score.position,
-                placementPercent: score.positionPercent,
                 date: moment(score.date).format("DD MMM YYYY")
             }
         })
@@ -70,7 +74,7 @@ const Score = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
                 <Line type="linear" yAxisId={"left"} dot={false} name="Score" dataKey="score" stroke="#8884d8" />
                 <XAxis dataKey="date" />
                 <YAxis dataKey="score" />
-                <Tooltip contentStyle={{ backgroundColor: "black" }} />
+                <Tooltip contentStyle={{ backgroundColor: "black" }} formatter={(num) => num.toLocaleString()} />
             </LineChart>
         </ResponsiveContainer>
     )
@@ -95,7 +99,7 @@ const Placement = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
                 <Line type="linear" dot={false} name="Placement" dataKey="placement" stroke="#82ca9d" />
                 <XAxis dataKey="date" />
                 <YAxis dataKey="placement" />
-                <Tooltip contentStyle={{ backgroundColor: "black" }} />
+                <Tooltip contentStyle={{ backgroundColor: "black" }} formatter={(num, name, item) => item.payload.placementText} />
             </LineChart>
         </ResponsiveContainer>
     )
@@ -112,7 +116,7 @@ const User = () => {
         return Math.round(data.scoreData.reduce((acc, score) => acc + score.score, 0) / data.scoreData.length)
     }, [data])
 
-    if (isLoading) return <div>Loading...</div>
+    if (isLoading) return <Loading fullPage />
     if (isError) return <div>Error loading user</div>
     if (!data) return <div>User not found</div>
 

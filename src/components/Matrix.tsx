@@ -36,7 +36,7 @@ export const MatrixColumn = ({ children }: { children: React.ReactNode }) => {
 export const MatrixCell = ({ children, data }: { children?: React.ReactNode, data: ICellData }) => {
     return (
         <Tooltip title={data?.Tooltip}>
-            <div className="matrix-cell" style={{ backgroundColor: data?.color }}>
+            <div className="matrix-cell" style={{ background: data?.color }}>
                 {children}
             </div>
         </Tooltip>
@@ -85,7 +85,7 @@ export const Matrix = ({ data, legendData, defaultColor }: { data: IMatrixData, 
             <Row className="justify-center" style={{ marginTop: 16 }}>
                 {legendData.map((item) => (
                     <div key={item.label} style={{ paddingLeft: 8, paddingRight: 8 }}>
-                        <span style={{ backgroundColor: item.color, borderRadius: 4, width: 16, height: 16, display: "inline-block", marginRight: 4 }}></span>
+                        <span style={{ background: item.color, borderRadius: 4, width: 16, height: 16, display: "inline-block", marginRight: 4 }}></span>
                         {item.label}
                     </div>
                 ))}

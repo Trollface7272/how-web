@@ -7,6 +7,7 @@ import { procedure, router } from "../trpc";
 
 const dailyChallengeRouter = router({
     getChartData: procedure.query(async () => {
+        await new Promise(resolve => setTimeout(resolve, 1000))
         const data = await dailyChallengeModel()
             .aggregate([{
                 $project: {
@@ -78,7 +79,6 @@ const dailyChallengeRouter = router({
                         }))
                         .query(async ({ input }) => {
                             const cursor = input.cursor ?? 0
-                            console.log(input.cursor, input.limit)
                             const data = await dailyChallengeUserModel()
                                 .aggregate([{
                                     $sort: {
