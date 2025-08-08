@@ -78,7 +78,7 @@ export const Matrix = (
             )
         }
         return matrix
-    }, [data, defaultColor, from, to])
+    }, [data, defaultColor, from, to, minDate, maxDate])
 
     return (
         <div className="matrix">
