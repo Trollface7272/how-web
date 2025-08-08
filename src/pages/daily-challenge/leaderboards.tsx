@@ -42,7 +42,7 @@ const Leaderboards = () => {
             top10Percent: item.top10Percent.count,
             top50Percent: item.top50Percent.count
         })) || []
-    }, [data, page, isLoading])
+    }, [data, page, isFetching])
 
     if (isLoading) return <Loading fullPage />
     if (isError) return <div>Error loading leaderboards</div>
