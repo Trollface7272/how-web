@@ -1,3 +1,4 @@
+import moment from "moment"
 
 
 export const modAcronyms = {
@@ -48,3 +49,6 @@ export const modAcronyms = {
     "TR": "Tracable",
     "RX": "Relax",
 }
+
+
+export const firstDailyChallengeDate = () => moment("2024-07-25")

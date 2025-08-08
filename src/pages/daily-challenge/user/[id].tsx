@@ -11,6 +11,7 @@ import { useMemo, useState } from "react"
 import { Loading } from "../../../components/Loading"
 import { Select } from "antd"
 import { extendMoment } from "moment-range"
+import { firstDailyChallengeDate } from "../../../utils/osu"
 
 //@ts-ignore
 const moment = extendMoment(Moment)
@@ -48,7 +49,7 @@ const Participation = ({ scores }: { scores: GetUserResponse["scoreData"] }) => 
     const [filter, setFilter] = useState<null | number>(2025)
     const cellData: Record<string, ICellData> = {}
 
-    const minDate = Moment("2024-07-25")
+    const minDate = firstDailyChallengeDate()
     const maxDate = moment().startOf("day")
 
 
@@ -102,7 +103,6 @@ const Score = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
             }
         })
     }, [scores])
-    console.log(data)
 
     return (
         <ResponsiveContainer width={"100%"} height={400}>
@@ -127,7 +127,6 @@ const Placement = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
             }
         })
     }, [scores])
-    console.log(data)
 
     return (
         <ResponsiveContainer width={"100%"} height={400}>

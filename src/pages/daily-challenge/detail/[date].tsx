@@ -1,5 +1,5 @@
 "use client"
-import { DatePicker, theme } from "antd"
+import { DatePicker } from "antd"
 import dayjs from "dayjs"
 import moment from "moment"
 import Image from "next/image"
@@ -14,6 +14,7 @@ import { Row } from "../../../components/Row"
 import { Beatmap, GetCurrentChallengeUserScore, Thresholds } from "../../../types/daily-challenge"
 import { Mod as IMod } from "../../../types/daily-challenge-profile"
 import { formatTime } from "../../../utils/helpers"
+import { firstDailyChallengeDate } from "../../../utils/osu"
 import { trpc } from "../../../utils/trpc"
 
 const DailyChallengePicker = () => {
@@ -22,7 +23,7 @@ const DailyChallengePicker = () => {
     if (date === "current") date = dayjs().format("YYYY-MM-DD")
 
     return (
-        <DatePicker style={{ padding: 8 }} defaultValue={dayjs(date as string, "YYYY-MM-DD")} format="YYYY-MM-DD" onChange={(d) => {
+        <DatePicker style={{ padding: 8 }} defaultValue={dayjs(date as string, "YYYY-MM-DD")} format="YYYY-MM-DD" minDate={dayjs(firstDailyChallengeDate().toDate())} allowClear={false} maxDate={dayjs()} onChange={(d) => {
             if (d) {
                 router?.push(`/daily-challenge/detail/${d.format("YYYY-MM-DD")}`)
             }
@@ -127,12 +128,12 @@ const ThresholdsGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
     const [hidden, setHidden] = useState<string[]>(["top1", "top25", "top75"])
     const data = thresholds.map(threshold => ({
         date: moment(threshold.date).format("HH:mm"),
-        rank1: threshold.rank1.score,
-        top1: threshold.top1.score,
-        top10: threshold.top10.score,
-        top25: threshold.top25.score,
-        top50: threshold.top50.score,
-        top75: threshold.top75.score,
+        rank1: threshold?.rank1?.score,
+        top1: threshold?.top1?.score,
+        top10: threshold?.top10?.score,
+        top25: threshold?.top25?.score,
+        top50: threshold?.top50?.score,
+        top75: threshold?.top75?.score,
     }))
 
     const handleLegendClick = (dataKey: string) => {
@@ -161,7 +162,7 @@ const ThresholdsGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
     )
 }
 
-const DailyChallengeCurrent = () => {
+const DailyChallengeDetail = () => {
     const router = useRouter()
     const { date } = router?.query || { date: null }
     const { data, isLoading, isError } = trpc.dailyChallenge.getDailyChallenge.useQuery({ date: date === "current" ? undefined : date as string })
@@ -192,4 +193,4 @@ const DailyChallengeCurrent = () => {
     )
 }
 
-export default DailyChallengeCurrent
+export default DailyChallengeDetail
