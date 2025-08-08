@@ -68,6 +68,9 @@ dependencies:
   next:
     specifier: 15.4.5
     version: 15.4.5(react-dom@18.2.0)(react@18.2.0)
+  node-cache:
+    specifier: ^5.1.2
+    version: 5.1.2
   react:
     specifier: 18.2.0
     version: 18.2.0
@@ -83,6 +86,9 @@ dependencies:
   ts-cache-mongoose:
     specifier: ^1.7.4
     version: 1.7.4(bson@6.10.4)(mongoose@6.13.8)
+  ts-deep-pick:
+    specifier: ^0.2.2
+    version: 0.2.2
   typescript:
     specifier: 4.9.4
     version: 4.9.4
@@ -2531,6 +2537,11 @@ packages:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
     dev: false
 
+  /clone@2.1.2:
+    resolution: {integrity: sha512-3Pe/CF1Nn94hyhIYpjtiLhdCoEoz0DqQ+988E9gmeEdQZlojxnOb74wctFyuwWQHzqyf9X7C7MG8juUpqBJT8w==}
+    engines: {node: '>=0.8'}
+    dev: false
+
   /clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
     engines: {node: '>=6'}
@@ -4242,6 +4253,13 @@ packages:
       - babel-plugin-macros
     dev: false
 
+  /node-cache@5.1.2:
+    resolution: {integrity: sha512-t1QzWwnk4sjLWaQAS8CHgOJ+RAfmHpxFWmc36IWTiWHQfs0w5JDMBS1b1ZxQteo0vVVuWJvIUKHDkkeK7vIGCg==}
+    engines: {node: '>= 8.0.0'}
+    dependencies:
+      clone: 2.1.2
+    dev: false
+
   /nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
     dependencies:
@@ -5584,6 +5602,16 @@ packages:
       sort-keys: 4.2.0
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /ts-deep-pick@0.2.2:
+    resolution: {integrity: sha512-DFR0THXKY8Hil84r4vx5Ofb7zVryHCBfv/vYcgbDyymmivdB1vUcBwbYsDzP3j9pwnQqVFNZZplYu628STrXAA==}
+    dependencies:
+      ts-typetools: 0.6.2
+    dev: false
+
+  /ts-typetools@0.6.2:
+    resolution: {integrity: sha512-Ke2q5ejYamdlJxs5lvcl7uet+2Bm22MXlTTT9vjopVaDlx/rHMek60qap1tTzPlYoab+aeaIL8fHS7XakJQx7A==}
     dev: false
 
   /tsconfig-paths@3.15.0:

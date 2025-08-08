@@ -157,7 +157,6 @@ const ModsChart = ({ data }: { data: DailyChallengeData[] }) => {
     const allUsedCombinationsData = Object.values(modsData.used.combinations).sort((a, b) => b.value - a.value)
     const usedCombinationsData = [...allUsedCombinationsData.slice(0, 15), allUsedCombinationsData.slice(15).reduce((acc, curr) => { acc.value += curr.value; return acc }, { name: "Other", value: 0 })]
 
-    const RADIAN = Math.PI / 180
 
     return (
         <>

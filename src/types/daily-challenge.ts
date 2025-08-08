@@ -1,3 +1,5 @@
+import { IDailyChallengeScore } from "./daily-challenge-score"
+
 export interface GetDailyChallengeResponse {
     dailyChallenge: DailyChallengeData[]
     retentionData: RetentionData
@@ -11,7 +13,10 @@ export type RetentionData = {
 export interface GetCurrentChallengeResponse {
     currentChallenge: Pick<CurrentPlaylistItem, "beatmap" | "required_mods">
     thresholds: Thresholds[]
+    currentUserScore: GetCurrentChallengeUserScore
 }
+
+export type GetCurrentChallengeUserScore = Pick<IDailyChallengeScore, "id" | "total_score" | "position">
 
 export interface GetLeaderboardsResponse {
     username: string,

@@ -1,9 +1,13 @@
 import moment from "moment";
 import z from "zod";
 import dailyChallengeUserModel from "../../models/daily-challenge-profile.model";
+import dailyChallengeScoreModel from "../../models/daily-challenge-score.model";
 import dailyChallengeModel from "../../models/daily-challenge.model";
-import { GetCurrentChallengeResponse, GetDailyChallengeResponse, GetLeaderboardsResponse, GetUserResponse, RetentionData } from "../../types/daily-challenge";
+import { lookupUser } from "../../models/session.model";
+import { GetCurrentChallengeResponse, GetDailyChallengeResponse, GetLeaderboardsResponse, GetUserResponse, IDailyChallenge, RetentionData } from "../../types/daily-challenge";
 import { procedure, router } from "../trpc";
+import { DeepPick } from "ts-deep-pick";
+import { IDailyChallengeScore } from "../../types/daily-challenge-score";
 
 const dailyChallengeRouter = router({
     getChartData: procedure.query(async () => {
@@ -39,108 +43,112 @@ const dailyChallengeRouter = router({
             retentionData.country[user.country][user.played.count]++
         })
 
+        return {
+            dailyChallenge: data,
+            retentionData
+        } as GetDailyChallengeResponse
+    }),
+    getDailyChallenge: procedure
+        .input(z.object({
+            date: z.string().optional().default(moment().format("YYYY-MM-DD")),
+        }))
+        .query(async ({ input, ctx }) => {
+            const data = await dailyChallengeModel()
+                .findOne({
+                    starts_at: { $gt: new Date(input.date) }
+                }, { _id: 0, "current_playlist_item.beatmap": 1, "current_playlist_item.required_mods": 1, "thresholds": 1, "current_playlist_item.room_id": 1 })
+                .exec() as DeepPick<IDailyChallenge, "current_playlist_item.beatmap" | "current_playlist_item.required_mods" | "thresholds" | "current_playlist_item.room_id">
+
+            let userScore = null
+            if (ctx.cookies?.session) {
+                const user = await lookupUser(ctx.cookies.session)
+                if (user?.osu?.userId) {
+                    userScore = await dailyChallengeScoreModel()
+                        .findOne({ "user.id": user.osu.userId, room_id: data.current_playlist_item.room_id }, { _id: 0, id: 1, total_score: 1, position: 1 })
+                        .exec() as DeepPick<IDailyChallengeScore, "id" | "total_score" | "position">
+                }
+            }
+
             return {
-                dailyChallenge: data,
-                retentionData
-            } as GetDailyChallengeResponse
+                currentChallenge: data.current_playlist_item,
+                thresholds: data.thresholds,
+                currentUserScore: userScore
+            } as GetCurrentChallengeResponse
         }),
-            getDailyChallenge: procedure
-                .input(z.object({
-                    date: z.string().optional().default(moment().format("YYYY-MM-DD")),
-                }))
-                    .query(async ({ input }) => {
-                        const data = await dailyChallengeModel()
-                            .aggregate([{
-                                $match: {
-                                    starts_at: { $gt: new Date(input.date) }
-                                }
-                            }, {
-                                $limit: 1
-                            }, {
-                                $project: {
-                                    _id: 0, "current_playlist_item.beatmap": 1, "current_playlist_item.required_mods": 1, "thresholds": 1
-                                }
-                            }])
-                            .exec()
-                        return {
-                            currentChallenge: data[0].current_playlist_item,
-                            thresholds: data[0].thresholds
-                        } as GetCurrentChallengeResponse
-                    }),
-                    getLeaderboards: procedure
-                        .input(z.object({
-                            sort: z.enum(["top10Percent", "top50Percent", "played"]).optional().default("played").transform(
-                                (value) => {
-                                    return `${value}.count`
-                                }
-                            ),
-                            cursor: z.number().nullish(),
-                            limit: z.number().optional().default(100)
-                        }))
-                        .query(async ({ input }) => {
-                            const cursor = input.cursor ?? 0
-                            const data = await dailyChallengeUserModel()
-                                .aggregate([{
-                                    $sort: {
-                                        [input.sort]: -1,
-                                        "top10Percent.count": -1,
-                                    }
-                                }, {
-                                    $skip: cursor
-                                }, {
-                                    $limit: input.limit
-                                }, {
-                                    $project: {
-                                        _id: 0, username: 1, id: 1, country: 1,
-                                        "played.count": 1, "top10Percent.count": 1, "top50Percent.count": 1
-                                    }
-                                }])
-                                .exec()
+    getLeaderboards: procedure
+        .input(z.object({
+            sort: z.enum(["top10Percent", "top50Percent", "played"]).optional().default("played").transform(
+                (value) => {
+                    return `${value}.count`
+                }
+            ),
+            cursor: z.number().nullish(),
+            limit: z.number().optional().default(100)
+        }))
+        .query(async ({ input, ctx }) => {
+            const cursor = input.cursor ?? 0
+            const data = await dailyChallengeUserModel()
+                .aggregate([{
+                    $sort: {
+                        [input.sort]: -1,
+                        "top10Percent.count": -1,
+                    }
+                }, {
+                    $skip: cursor
+                }, {
+                    $limit: input.limit
+                }, {
+                    $project: {
+                        _id: 0, username: 1, id: 1, country: 1,
+                        "played.count": 1, "top10Percent.count": 1, "top50Percent.count": 1
+                    }
+                }])
+                .exec()
 
-                            return {
-                                data: data as GetLeaderboardsResponse[],
-                                nextCursor: cursor + input.limit,
-                                page: Math.floor(cursor / input.limit),
-                                total: await dailyChallengeUserModel().count({}).cache("10m").exec()
-                            }
-                        }),
-                        getUser: procedure
-                            .input(z.object({
-                                id: z.string(),
-                            }))
-                            .query(async ({ input }) => {
-                                const data = await dailyChallengeUserModel()
-                                    .aggregate([{
-                                        $match: {
-                                            id: parseInt(input.id)
-                                        }
-                                    }, {
-                                        $project: {
-                                            _id: 0, username: 1, id: 1, country: 1,
-                                            "played.count": 1,
-                                            "top10Percent.count": 1, "top50Percent.count": 1,
-                                            "scoreData.room_id": 1, "scoreData.score_id": 1,
-                                            "scoreData.score": 1, "scoreData.accuracy": 1,
-                                            "scoreData.rank": 1, "scoreData.date": 1,
-                                            "scoreData.position": 1, "scoreData.positionPercent": 1,
-                                            averagePlacement: 1, averagePlacementPercent: 1
-                                        }
-                                    }])
-                                    .exec()
-                                return data[0] as GetUserResponse
-                            }),
-                            searchUser: procedure
-                                .input(z.object({
-                                    query: z.string(),
-                                }))
-                                .query(async ({ input }) => {
-                                    const data = await dailyChallengeUserModel().find({ username: { $regex: input.query, $options: "i" } }, { username: 1, id: 1, country: 1 }).limit(10).exec()
-                                    return data as {
-                                        username: string,
-                                        id: number,
-                                        country: string
-                                    }[]
-                                })
-    });
+            return {
+                data: data as GetLeaderboardsResponse[],
+                nextCursor: cursor + input.limit,
+                page: Math.floor(cursor / input.limit),
+                total: await dailyChallengeUserModel().count({}).cache("10m").exec()
+            }
+        }),
+    getUser: procedure
+        .input(z.object({
+            id: z.string(),
+        }))
+        .query(async ({ input }) => {
+            const data = await dailyChallengeUserModel()
+                .aggregate([{
+                    $match: {
+                        id: parseInt(input.id)
+                    }
+                }, {
+                    $project: {
+                        _id: 0, username: 1, id: 1, country: 1,
+                        "played.count": 1,
+                        "top10Percent.count": 1, "top50Percent.count": 1,
+                        "scoreData.room_id": 1, "scoreData.score_id": 1,
+                        "scoreData.score": 1, "scoreData.accuracy": 1,
+                        "scoreData.rank": 1, "scoreData.date": 1,
+                        "scoreData.position": 1, "scoreData.positionPercent": 1,
+                        averagePlacement: 1, averagePlacementPercent: 1
+                    }
+                }])
+                .exec()
+            return data[0] as GetUserResponse
+        }),
+    searchUser: procedure
+        .input(z.object({
+            query: z.string(),
+        }))
+        .query(async ({ input }) => {
+            const data = await dailyChallengeUserModel().find({ username: { $regex: input.query, $options: "i" } }, { username: 1, id: 1, country: 1 }).limit(10).exec()
+            return data as {
+                username: string,
+                id: number,
+                country: string
+            }[]
+        })
+});
 
-    export default dailyChallengeRouter;
+export default dailyChallengeRouter;

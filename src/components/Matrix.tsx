@@ -44,7 +44,9 @@ export const MatrixCell = ({ children, data }: { children?: React.ReactNode, dat
 }
 
 
-export const Matrix = ({ data, legendData, defaultColor }: { data: IMatrixData, legendData: { color: string, label: string }[], defaultColor: string }) => {
+export const Matrix = (
+    { data, legendData, defaultColor, from, to, minDate, maxDate }:
+        { data: IMatrixData, legendData: { color: string, label: string }[], defaultColor: string, from?: Moment.Moment, to?: Moment.Moment, minDate?: Moment.Moment, maxDate?: Moment.Moment }) => {
 
     const chart = useMemo(() => {
         const cellData = data.CellData
@@ -53,8 +55,8 @@ export const Matrix = ({ data, legendData, defaultColor }: { data: IMatrixData, 
             return new Date(a).getTime() - new Date(b).getTime()
         })
 
-        const toDate = moment().endOf("week")
-        const fromDate = moment(toDate).add(-365, "days").startOf("week")
+        const toDate = to ? to : moment().endOf("week")
+        const fromDate = from ? from : moment(toDate).add(-365, "days").startOf("week")
         const weeks = moment.range(fromDate, toDate)
         const iterator = weeks.by("week")
         const matrix = []
@@ -63,19 +65,20 @@ export const Matrix = ({ data, legendData, defaultColor }: { data: IMatrixData, 
             for (let i = 0; i < 7; i++) {
                 let dColor = defaultColor
                 const day = moment(week).day(i)
-                if (day.isSameOrAfter(moment().startOf("day"))) dColor = "transparent"
+                if (maxDate && day.isSameOrAfter(maxDate)) dColor = "gray"
+                if (minDate && day.isBefore(minDate)) dColor = "gray"
                 row.push(
                     <MatrixCell data={data.CellData[day.format("YYYY-MM-DD")] || { date: day.toDate(), color: dColor }} key={day.format("YYYY-MM-DD")}></MatrixCell>
                 )
             }
             matrix.push(
-                <MatrixColumn>
+                <MatrixColumn key={week.format("YYYY-MM-DD")}>
                     {row}
                 </MatrixColumn>
             )
         }
         return matrix
-    }, [data, defaultColor])
+    }, [data, defaultColor, from, to])
 
     return (
         <div className="matrix">

@@ -11,7 +11,7 @@ import { Container } from "../../../components/GraphContainer"
 import { Loading } from "../../../components/Loading"
 import { Mod } from "../../../components/Mod"
 import { Row } from "../../../components/Row"
-import { Beatmap, Thresholds } from "../../../types/daily-challenge"
+import { Beatmap, GetCurrentChallengeUserScore, Thresholds } from "../../../types/daily-challenge"
 import { Mod as IMod } from "../../../types/daily-challenge-profile"
 import { formatTime } from "../../../utils/helpers"
 import { trpc } from "../../../utils/trpc"
@@ -30,7 +30,24 @@ const DailyChallengePicker = () => {
     )
 }
 
-const BeatmapInfo = ({ beatmap, required_mods, thresholds }: { beatmap: Beatmap, required_mods: IMod[], thresholds: Thresholds[] }) => {
+const UserScore = ({ user_score, total_scores }: { user_score?: GetCurrentChallengeUserScore, total_scores: number }) => {
+    if (!user_score) return null
+
+    const placementPercentage = (user_score.position / total_scores) * 100
+
+    const colorClass = placementPercentage <= 1 ? "text-rank-1" : placementPercentage <= 10 ? "text-top-10" : "text-top-50"
+
+    return (
+        <Row>
+            <div className={colorClass}>
+                Achieved score: <span>{user_score.total_score.toLocaleString()}</span>
+                <span> (#{user_score.position})</span>
+            </div>
+        </Row>
+    )
+}
+
+const BeatmapInfo = ({ beatmap, required_mods, thresholds, user_score }: { beatmap: Beatmap, required_mods: IMod[], thresholds: Thresholds[], user_score?: GetCurrentChallengeUserScore }) => {
     const threshold = thresholds.at(-1)!
     return (
         <>
@@ -57,10 +74,11 @@ const BeatmapInfo = ({ beatmap, required_mods, thresholds }: { beatmap: Beatmap,
                         <div style={{ width: "33%" }}>BPM: <span>{beatmap.bpm}</span></div>
                     </Row>
                     <Row>
-                        <div style={{ width: "33%" }}>Top 1: <span>{threshold.rank1.score.toLocaleString()}</span></div>
-                        <div style={{ width: "33%" }}>Top 10%: <span>{threshold.top10.score.toLocaleString()}</span><span> (#{threshold.top10.position})</span></div>
-                        <div style={{ width: "33%" }}>Top 50%: <span>{threshold.top50.score.toLocaleString()}</span><span> (#{threshold.top50.position})</span></div>
+                        <div className="text-rank-1" style={{ width: "33%" }}>Rank 1: <span>{threshold.rank1.score.toLocaleString()}</span></div>
+                        <div className="text-top-10" style={{ width: "33%" }}>Top 10%: <span>{threshold.top10.score.toLocaleString()}</span><span> (#{threshold.top10.position})</span></div>
+                        <div className="text-top-50" style={{ width: "33%" }}>Top 50%: <span>{threshold.top50.score.toLocaleString()}</span><span> (#{threshold.top50.position})</span></div>
                     </Row>
+                    <UserScore user_score={user_score} total_scores={threshold.total} />
                     <Row style={{ marginTop: 16 }}>
                         <DailyChallengePicker />
                     </Row>
@@ -106,12 +124,15 @@ const ParticipationGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
 }
 
 const ThresholdsGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
-    const [hidden, setHidden] = useState<string[]>([])
+    const [hidden, setHidden] = useState<string[]>(["top1", "top25", "top75"])
     const data = thresholds.map(threshold => ({
         date: moment(threshold.date).format("HH:mm"),
-        top1: threshold.rank1.score,
+        rank1: threshold.rank1.score,
+        top1: threshold.top1.score,
         top10: threshold.top10.score,
+        top25: threshold.top25.score,
         top50: threshold.top50.score,
+        top75: threshold.top75.score,
     }))
 
     const handleLegendClick = (dataKey: string) => {
@@ -125,11 +146,14 @@ const ThresholdsGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
     return (
         <ResponsiveContainer width="100%" height={300}>
             <LineChart data={data}>
-                <Line type={"linear"} hide={hidden.includes("top1")} dataKey="top1" dot={false} name={"Rank 1"} stroke="yellow" strokeWidth={1.5} />
-                <Line type={"linear"} hide={hidden.includes("top10")} dataKey="top10" dot={false} name={"Top 10%"} stroke="silver" strokeWidth={1.5} />
-                <Line type={"linear"} hide={hidden.includes("top50")} dataKey="top50" dot={false} name={"Top 50%"} stroke="#CD7F32" strokeWidth={1.5} />
+                <Line type={"linear"} hide={hidden.includes("rank1")} dataKey="rank1" dot={false} name={"Rank 1"} stroke="var(--gold)" strokeWidth={1.2} />
+                <Line type={"linear"} hide={hidden.includes("top1")} dataKey="top1" dot={false} name={"Top 1%"} stroke="var(--purple)" strokeWidth={1.2} />
+                <Line type={"linear"} hide={hidden.includes("top10")} dataKey="top10" dot={false} name={"Top 10%"} stroke="var(--silver)" strokeWidth={1.2} />
+                <Line type={"linear"} hide={hidden.includes("top25")} dataKey="top25" dot={false} name={"Top 25%"} stroke="var(--blue)" strokeWidth={1.2} />
+                <Line type={"linear"} hide={hidden.includes("top50")} dataKey="top50" dot={false} name={"Top 50%"} stroke="var(--bronze)" strokeWidth={1.2} />
+                <Line type={"linear"} hide={hidden.includes("top75")} dataKey="top75" dot={false} name={"Top 75%"} stroke="var(--iron)" strokeWidth={1.2} />
                 <XAxis dataKey="date" />
-                <YAxis />
+                <YAxis domain={["auto", "auto"]} />
                 <Tooltip contentStyle={{ backgroundColor: "black" }} formatter={(num) => num.toLocaleString()} />
                 <Legend onClick={props => handleLegendClick(props.dataKey as string)} />
             </LineChart>
@@ -146,14 +170,14 @@ const DailyChallengeCurrent = () => {
     if (isError) return <div>Error</div>
     if (!data) return <div>No data</div>
 
-    const { currentChallenge: { beatmap, required_mods }, thresholds } = data
+    const { currentChallenge: { beatmap, required_mods }, thresholds, currentUserScore } = data
 
 
     return (
         <div>
             <Container title="Current Challenge">
                 <div style={{ display: "flex", gap: 16, flexDirection: "row" }}>
-                    <BeatmapInfo beatmap={beatmap} required_mods={required_mods} thresholds={thresholds} />
+                    <BeatmapInfo beatmap={beatmap} required_mods={required_mods} thresholds={thresholds} user_score={currentUserScore} />
                 </div>
             </Container>
 

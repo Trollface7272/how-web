@@ -1,5 +1,5 @@
 "use client"
-import moment from "moment"
+import Moment from "moment"
 import Image from "next/image"
 import { useRouter } from "next/router"
 import { Container } from "../../../components/GraphContainer"
@@ -7,9 +7,13 @@ import { ICellData, IMatrixData, Matrix } from "../../../components/Matrix"
 import { trpc } from "../../../utils/trpc"
 import { GetUserResponse } from "../../../types/daily-challenge"
 import { Line, LineChart, ResponsiveContainer, YAxis, XAxis, Tooltip } from "recharts"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { Loading } from "../../../components/Loading"
+import { Select } from "antd"
+import { extendMoment } from "moment-range"
 
+//@ts-ignore
+const moment = extendMoment(Moment)
 
 const legendData = [
     { color: "var(--lustrous-gradient)", label: "Rank 1" },
@@ -41,8 +45,22 @@ const CellTooltip = ({ placement, placementPercent, score, date }: { placement: 
 }
 
 const Participation = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
+    const [filter, setFilter] = useState<null | number>(2025)
     const cellData: Record<string, ICellData> = {}
+
+    const minDate = Moment("2024-07-25")
+    const maxDate = moment().startOf("day")
+
+
+    const [from, to] = useMemo(() => {
+        if (filter) {
+            return [moment().year(filter).startOf("year").startOf("week"), moment().year(filter).endOf("year").endOf("week")]
+        }
+        return [undefined, undefined]
+    }, [filter])
+
     scores.forEach((score) => {
+        if (from && from >= moment(score.date) && to && to <= moment(score.date)) return
         cellData[moment(score.date).format("YYYY-MM-DD")] = {
             date: new Date(score.date),
             color: placementToColor(score.position, score.positionPercent),
@@ -52,8 +70,26 @@ const Participation = ({ scores }: { scores: GetUserResponse["scoreData"] }) => 
     const matrixData: IMatrixData = {
         CellData: cellData
     }
+
+    const years = useMemo(() => {
+        const ret = []
+        for (let i = 2024; i <= moment().year(); i++) {
+            ret.push(i)
+        }
+        return ret
+    }, [])
+
     return (
-        <Matrix data={matrixData} legendData={legendData} defaultColor={legendData.at(-1)!.color} />
+        <>
+            <div style={{ marginBottom: 10, display: "flex", justifyContent: "center" }}>
+                <Select style={{ width: 100 }} value={filter} onChange={(value) => setFilter(value as number)}>
+                    <Select.Option value={null}>Last year</Select.Option>
+                    {years.map(el => <Select.Option key={el} value={el}>{el}</Select.Option>)}
+
+                </Select>
+            </div>
+            <Matrix data={matrixData} legendData={legendData} defaultColor={legendData.at(-1)!.color} from={from} to={to} minDate={minDate} maxDate={maxDate} />
+        </>
     )
 }
 

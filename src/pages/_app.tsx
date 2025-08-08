@@ -11,7 +11,6 @@ import { usePathname } from "next/navigation"
 import { IUserContext } from "../models/user.model";
 import { UserContext } from "../context/User";
 import { Row } from "../components/Row";
-import { deleteCookie } from "cookies-next/client"
 
 const LoginButton = () => {
     return (
@@ -45,14 +44,14 @@ const ProfileButton = () => {
 
 const SideMenu = () => {
     const href = usePathname() ?? ""
-    const [collapsed, setCollapsed] = useState(false);
+    // const [collapsed, setCollapsed] = useState(false);
     const user = useContext<IUserContext | null>(UserContext)
 
     return (
         <Sider
-            collapsible
-            collapsed={collapsed}
-            onCollapse={(value) => setCollapsed(value)}
+            // collapsible
+            // collapsed={collapsed}
+            // onCollapse={(value) => setCollapsed(value)}
         >
 
 
