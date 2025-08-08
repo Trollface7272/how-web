@@ -58,7 +58,16 @@ export const lookupUser = async (sessionCookie: string) => {
         .findOne({ id: session.userId }, { _id: 0, id: 1, username: 1, "osu.username": 1, "osu.userId": 1 })
         .exec()
 
-    sessionCache.set(sessionCookie, user)
+    if (!user) return null
+
+    sessionCache.set(sessionCookie, {
+        id: user.id,
+        username: user.username,
+        osu: {
+            username: user.osu?.username,
+            userId: user.osu?.userId
+        }
+    })
 
     return user as IClientUser
 }
