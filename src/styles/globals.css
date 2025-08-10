@@ -1,3 +1,7 @@
+@import "./generics.css";
+@import "./matrix.css";
+@import "./osu-colors.css";
+
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
@@ -104,7 +108,3 @@ a {
 .table-row-cursor-pointer td {
   cursor: pointer;
 }
-
-@import "./generics.css";
-@import "./matrix.css";
-@import "./osu-colors.css";

@@ -1,6 +1,6 @@
 import { Tooltip } from "antd"
 import { Mod as IMod } from "../types/daily-challenge-profile"
-import { modAcronyms } from "../utils/osu"
+import { modAcronyms } from "../utils/osu/osu"
 
 const modConfig = {
     "NM": {

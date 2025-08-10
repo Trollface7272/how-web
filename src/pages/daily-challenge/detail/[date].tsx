@@ -14,7 +14,7 @@ import { Row } from "../../../components/Row"
 import { Beatmap, GetCurrentChallengeUserScore, Thresholds } from "../../../types/daily-challenge"
 import { Mod as IMod } from "../../../types/daily-challenge-profile"
 import { formatTime } from "../../../utils/helpers"
-import { firstDailyChallengeDate } from "../../../utils/osu"
+import { firstDailyChallengeDate } from "../../../utils/osu/osu"
 import { trpc } from "../../../utils/trpc"
 
 const DailyChallengePicker = () => {
@@ -59,7 +59,7 @@ const BeatmapInfo = ({ beatmap, required_mods, thresholds, user_score }: { beatm
                     <span>{beatmap.beatmapset.title}</span>
                     <span> [{beatmap.version}]</span>
                     <span style={{ fontSize: 32, marginLeft: 8, display: "flex" }}>
-                        {required_mods.map((mod) => <Mod key={mod.acronym} mod={mod} />)}
+                        {required_mods?.map((mod) => <Mod key={mod.acronym} mod={mod} />)}
                     </span>
                 </div>
                 <Box>
@@ -173,7 +173,7 @@ const DailyChallengeDetail = () => {
 
     const { currentChallenge: { beatmap, required_mods }, thresholds, currentUserScore } = data
 
-
+    console.log(data)
     return (
         <div>
             <Container title="Current Challenge">

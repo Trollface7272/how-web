@@ -11,7 +11,8 @@ import { useMemo, useState } from "react"
 import { Loading } from "../../../components/Loading"
 import { Select } from "antd"
 import { extendMoment } from "moment-range"
-import { firstDailyChallengeDate } from "../../../utils/osu"
+import { firstDailyChallengeDate } from "../../../utils/osu/osu"
+import { TooltipIndex } from "recharts/types/state/tooltipSlice"
 
 //@ts-ignore
 const moment = extendMoment(Moment)
@@ -46,6 +47,7 @@ const CellTooltip = ({ placement, placementPercent, score, date }: { placement: 
 }
 
 const Participation = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
+    const router = useRouter()
     const [filter, setFilter] = useState<null | number>(2025)
     const cellData: Record<string, ICellData> = {}
 
@@ -80,6 +82,13 @@ const Participation = ({ scores }: { scores: GetUserResponse["scoreData"] }) => 
         return ret
     }, [])
 
+    const onDoubleClick = (data: ICellData) => {
+        const date = moment(data.date)
+        if (date.isBefore(firstDailyChallengeDate())) return
+        if (date.isAfter(moment())) return
+        router.push(`/daily-challenge/detail/${date.format("YYYY-MM-DD")}`)
+    }
+
     return (
         <>
             <div style={{ marginBottom: 10, display: "flex", justifyContent: "center" }}>
@@ -89,12 +98,13 @@ const Participation = ({ scores }: { scores: GetUserResponse["scoreData"] }) => 
 
                 </Select>
             </div>
-            <Matrix data={matrixData} legendData={legendData} defaultColor={legendData.at(-1)!.color} from={from} to={to} minDate={minDate} maxDate={maxDate} />
+            <Matrix onDoubleClick={onDoubleClick} data={matrixData} legendData={legendData} defaultColor={legendData.at(-1)!.color} from={from} to={to} minDate={minDate} maxDate={maxDate} />
         </>
     )
 }
 
 const Score = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
+    const router = useRouter()
     const data = useMemo(() => {
         return scores.map(score => {
             return {
@@ -104,9 +114,14 @@ const Score = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
         })
     }, [scores])
 
+    const onDoubleClick = (open?: number | TooltipIndex) => {
+        const date = moment(data[open as number].date)
+        router.push(`/daily-challenge/detail/${date.format("YYYY-MM-DD")}`)
+    }
+
     return (
         <ResponsiveContainer width={"100%"} height={400}>
-            <LineChart data={data}>
+            <LineChart data={data} onDoubleClick={(e) => onDoubleClick(e.activeIndex)}>
                 <Line type="linear" yAxisId={"left"} dot={false} name="Score" dataKey="score" stroke="#8884d8" />
                 <XAxis dataKey="date" />
                 <YAxis dataKey="score" />
@@ -117,7 +132,7 @@ const Score = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
 }
 
 const Placement = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
-
+    const router = useRouter()
     const data = useMemo(() => {
         return scores.map(score => {
             return {
@@ -128,9 +143,14 @@ const Placement = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
         })
     }, [scores])
 
+    const onDoubleClick = (open?: number | TooltipIndex) => {
+        const date = moment(data[open as number].date)
+        router.push(`/daily-challenge/detail/${date.format("YYYY-MM-DD")}`)
+    }
+
     return (
         <ResponsiveContainer width={"100%"} height={400}>
-            <LineChart data={data}>
+            <LineChart data={data} onDoubleClick={(e) => onDoubleClick(e.activeIndex)}>
                 <Line type="linear" dot={false} name="Placement" dataKey="placement" stroke="#82ca9d" />
                 <XAxis dataKey="date" />
                 <YAxis dataKey="placement" />

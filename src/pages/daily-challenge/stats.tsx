@@ -1,17 +1,18 @@
 "use client"
-import { DatePicker, Select, theme } from "antd";
+import { DatePicker, Select, Switch, theme } from "antd";
 import { Line, LineChart, YAxis, Tooltip, XAxis, ResponsiveContainer, Legend, PieChart, Pie, Cell } from "recharts";
 import { trpc } from "../../utils/trpc";
 import moment from "moment";
 import type { DailyChallengeData } from "../../types/daily-challenge";
-import { useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import dayjs from "dayjs";
-import { modAcronyms } from "../../utils/osu";
+import { modAcronyms } from "../../utils/osu/osu";
 import { Container } from "../../components/GraphContainer";
 import { Row } from "../../components/Row";
 import { Loading } from "../../components/Loading";
-import { PieLabelProps } from "recharts/types/polar/Pie";
-import { Mod } from "../../components/Mod";
+import { Mods } from "../../utils/osu/mods";
+import { TooltipIndex } from "recharts/types/state/tooltipSlice";
+import { useRouter } from "next/router";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d", "#a4de6c", "#d0ed57", "#ffc658", "#ff6b6b", "#90e0ef", "#00b4d8", "#007bff", "#0056b3", "#003d80", "#002650"]
 
@@ -42,6 +43,7 @@ type ModsData = {
 
 const Filters = ({ filters, setFilters }: { filters: Filters, setFilters: (filters: Filters) => void }) => {
     const { token } = theme.useToken()
+    const { settings, setSettings } = useContext(SettingsContext)
 
     return (
         <div style={{ padding: "16px", backgroundColor: token.colorBgElevated, marginTop: 12 }}>
@@ -56,18 +58,32 @@ const Filters = ({ filters, setFilters }: { filters: Filters, setFilters: (filte
                     style={{ width: 140, textAlign: "center" }}
                 />
             </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
+                <Switch checked={settings.normalize} onChange={(value) => setSettings({ ...settings, normalize: value })} />
+                <span>Normalize Score</span>
+            </div>
         </div>
     )
 }
 
 const ParticipationChart = ({ data }: { data: DailyChallengeData[] }) => {
+    const router = useRouter()
+
     const participationData = data.map(item => ({
         name: moment(item.starts_at).format("DD MMM YYYY"),
+        date: item.starts_at,
         total: item.total,
     }))
+
+    const onDoubleClick = (open?: number | TooltipIndex) => {
+        const date = moment(participationData[open as number].date)
+        router.push(`/daily-challenge/detail/${date.format("YYYY-MM-DD")}`)
+    }
+
+
     return (
         <ResponsiveContainer width={"100%"} height={400}>
-            <LineChart data={participationData}>
+            <LineChart data={participationData} onDoubleClick={(e) => onDoubleClick(e.activeIndex)}>
                 <Line type={"basis"} dataKey="total" dot={false} />
                 <YAxis />
                 <Tooltip contentStyle={{ backgroundColor: "black" }} />
@@ -79,6 +95,8 @@ const ParticipationChart = ({ data }: { data: DailyChallengeData[] }) => {
 
 const PlacementChart = ({ data }: { data: DailyChallengeData[] }) => {
     const [hidden, setHidden] = useState<string[]>(["top1", "top25", "top75"])
+    const { settings } = useContext(SettingsContext)
+    const router = useRouter()
 
     const handleLegendClick = (dataKey: string) => {
         if (hidden.includes(dataKey)) {
@@ -87,26 +105,36 @@ const PlacementChart = ({ data }: { data: DailyChallengeData[] }) => {
             setHidden(prev => [...prev, dataKey])
         }
     }
-    const placementData = data.map(item => ({
-        name: moment(item.starts_at).format("DD MMM YYYY"),
-        rank1: item.thresholds?.rank1?.score || 0,
-        top1: item.thresholds?.top1?.score || 0,
-        top10: item.thresholds?.top10?.score || 0,
-        top25: item.thresholds?.top25?.score || 0,
-        top50: item.thresholds?.top50?.score || 0,
-        top75: item.thresholds?.top75?.score || 0,
-    }))
+    const placementData = data.map(item => {
+        const multiplier = settings.normalize ? new Mods.ModList(item.current_playlist_item.required_mods as Mods.BaseMod[]).GetMultiplier() : 1
+
+        return {
+            name: moment(item.starts_at).format("DD MMM YYYY"),
+            date: item.starts_at,
+            rank1: Math.floor(item.thresholds?.rank1?.score / multiplier) || 0,
+            top1: Math.floor(item.thresholds?.top1?.score / multiplier) || 0,
+            top10: Math.floor(item.thresholds?.top10?.score / multiplier) || 0,
+            top25: Math.floor(item.thresholds?.top25?.score / multiplier) || 0,
+            top50: Math.floor(item.thresholds?.top50?.score / multiplier) || 0,
+            top75: Math.floor(item.thresholds?.top75?.score / multiplier) || 0,
+        }
+    })
+
+    const onDoubleClick = (open?: number | TooltipIndex) => {
+        const date = moment(placementData[open as number].date)
+        router.push(`/daily-challenge/detail/${date.format("YYYY-MM-DD")}`)
+    }
 
     return (
         <ResponsiveContainer width={"100%"} height={400}>
-            <LineChart data={placementData}>
-                <Line type={"basis"} hide={hidden.includes("rank1")} dataKey="rank1" dot={false} name={"Rank 1"} stroke="var(--gold)" strokeWidth={1.2} />
-                <Line type={"basis"} hide={hidden.includes("top1")} dataKey="top1" dot={false} name={"Top 1%"} stroke="var(--purple)" strokeWidth={1.2} />
-                <Line type={"basis"} hide={hidden.includes("top10")} dataKey="top10" dot={false} name={"Top 10%"} stroke="var(--silver)" strokeWidth={1.2} />
-                <Line type={"basis"} hide={hidden.includes("top25")} dataKey="top25" dot={false} name={"Top 25%"} stroke="var(--blue)" strokeWidth={1.2} />
-                <Line type={"basis"} hide={hidden.includes("top50")} dataKey="top50" dot={false} name={"Top 50%"} stroke="var(--bronze)" strokeWidth={1.2} />
-                <Line type={"basis"} hide={hidden.includes("top75")} dataKey="top75" dot={false} name={"Top 75%"} stroke="var(--iron)" strokeWidth={1.2} />
-                <YAxis />
+            <LineChart data={placementData} onDoubleClick={(e) => onDoubleClick(e.activeIndex)}>
+                <Line type={"linear"} hide={hidden.includes("rank1")} dataKey="rank1" dot={false} name={"Rank 1"} stroke="var(--gold)" strokeWidth={1.2} />
+                <Line type={"linear"} hide={hidden.includes("top1")} dataKey="top1" dot={false} name={"Top 1%"} stroke="var(--purple)" strokeWidth={1.2} />
+                <Line type={"linear"} hide={hidden.includes("top10")} dataKey="top10" dot={false} name={"Top 10%"} stroke="var(--silver)" strokeWidth={1.2} />
+                <Line type={"linear"} hide={hidden.includes("top25")} dataKey="top25" dot={false} name={"Top 25%"} stroke="var(--blue)" strokeWidth={1.2} />
+                <Line type={"linear"} hide={hidden.includes("top50")} dataKey="top50" dot={false} name={"Top 50%"} stroke="var(--bronze)" strokeWidth={1.2} />
+                <Line type={"linear"} hide={hidden.includes("top75")} dataKey="top75" dot={false} name={"Top 75%"} stroke="var(--iron)" strokeWidth={1.2} />
+                <YAxis domain={["auto", "auto"]} />
                 <Tooltip contentStyle={{ backgroundColor: "black" }} formatter={(num) => num.toLocaleString()} />
                 <XAxis dataKey="name" minTickGap={20} />
                 <Legend formatter={(value, entry) => (<span style={{ color: entry.inactive ? "gray" : entry?.color }}>{value}</span>)} onClick={props => handleLegendClick(props.dataKey as string)} />
@@ -244,10 +272,15 @@ const PlayerRetention = ({ data }: { data: Record<number, number> }) => {
         </ResponsiveContainer>
     )
 }
+type settings = {
+    normalize: boolean
+}
+const SettingsContext = createContext<{ settings: settings, setSettings: (settings: settings) => void }>({ settings: { normalize: false }, setSettings: () => { } })
 
 const DailyChallengeStats = () => {
     const { isLoading, isError, data } = trpc.dailyChallenge.getChartData.useQuery()
     const [filters, setFilters] = useState<Filters>({})
+    const [settings, setSettings] = useState<settings>({ normalize: false })
 
     const filtered = useMemo(() => {
         const dailyChallenge = data?.dailyChallenge?.filter(item => {
@@ -276,22 +309,24 @@ const DailyChallengeStats = () => {
 
     return (
         <>
-            <Filters filters={filters} setFilters={setFilters} />
-            <Container title="Participation">
-                <ParticipationChart data={filteredData} />
-            </Container>
+            <SettingsContext.Provider value={{ settings, setSettings }}>
+                <Filters filters={filters} setFilters={setFilters} />
+                <Container title="Participation">
+                    <ParticipationChart data={filteredData} />
+                </Container>
 
-            <Container title="Placement">
-                <PlacementChart data={filteredData} />
-            </Container>
+                <Container title="Placement">
+                    <PlacementChart data={filteredData} />
+                </Container>
 
-            <Container title="Mods">
-                <ModsChart data={filteredData} />
-            </Container>
+                <Container title="Mods">
+                    <ModsChart data={filteredData} />
+                </Container>
 
-            <Container title="Player Retention">
-                <PlayerRetention data={retentionData} />
-            </Container>
+                <Container title="Player Retention">
+                    <PlayerRetention data={retentionData} />
+                </Container>
+            </SettingsContext.Provider>
         </>
     )
 }

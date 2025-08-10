@@ -33,10 +33,10 @@ export const MatrixColumn = ({ children }: { children: React.ReactNode }) => {
     )
 }
 
-export const MatrixCell = ({ children, data }: { children?: React.ReactNode, data: ICellData }) => {
+export const MatrixCell = ({ children, data, onDoubleClick }: { children?: React.ReactNode, data: ICellData, onDoubleClick: (data: ICellData) => void }) => {
     return (
         <Tooltip title={data?.Tooltip}>
-            <div className="matrix-cell" style={{ background: data?.color }}>
+            <div onDoubleClick={() => onDoubleClick(data)} className="matrix-cell" style={{ background: data?.color }}>
                 {children}
             </div>
         </Tooltip>
@@ -45,8 +45,8 @@ export const MatrixCell = ({ children, data }: { children?: React.ReactNode, dat
 
 
 export const Matrix = (
-    { data, legendData, defaultColor, from, to, minDate, maxDate }:
-        { data: IMatrixData, legendData: { color: string, label: string }[], defaultColor: string, from?: Moment.Moment, to?: Moment.Moment, minDate?: Moment.Moment, maxDate?: Moment.Moment }) => {
+    { data, legendData, defaultColor, from, to, minDate, maxDate, onDoubleClick }:
+        { data: IMatrixData, legendData: { color: string, label: string }[], defaultColor: string, from?: Moment.Moment, to?: Moment.Moment, minDate?: Moment.Moment, maxDate?: Moment.Moment, onDoubleClick: (data: ICellData) => void }) => {
 
     const chart = useMemo(() => {
         const cellData = data.CellData
@@ -68,7 +68,7 @@ export const Matrix = (
                 if (maxDate && day.isSameOrAfter(maxDate)) dColor = "gray"
                 if (minDate && day.isBefore(minDate)) dColor = "gray"
                 row.push(
-                    <MatrixCell data={data.CellData[day.format("YYYY-MM-DD")] || { date: day.toDate(), color: dColor }} key={day.format("YYYY-MM-DD")}></MatrixCell>
+                    <MatrixCell onDoubleClick={onDoubleClick} data={data.CellData[day.format("YYYY-MM-DD")] || { date: day.toDate(), color: dColor }} key={day.format("YYYY-MM-DD")}></MatrixCell>
                 )
             }
             matrix.push(
@@ -78,7 +78,7 @@ export const Matrix = (
             )
         }
         return matrix
-    }, [data, defaultColor, from, to, minDate, maxDate])
+    }, [data, defaultColor, from, to, minDate, maxDate, onDoubleClick])
 
     return (
         <div className="matrix">

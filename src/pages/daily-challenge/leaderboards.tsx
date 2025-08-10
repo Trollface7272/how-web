@@ -12,14 +12,17 @@ import { Loading } from "../../components/Loading"
 
 const PER_PAGE = 10
 
+
 const Leaderboards = () => {
     const [search, setSearch] = useState("")
-    const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetching } =
-        trpc.dailyChallenge.getLeaderboards.useInfiniteQuery({ limit: PER_PAGE })
-    const { data: searchData, isLoading: isSearchLoading, isError: isSearchError } = trpc.dailyChallenge.searchUser.useQuery({ query: search }, { enabled: !!search })
-    const [page, setPage] = useState({
-        page: 0, previousPage: 0
-    })
+    const [page, setPage] = useState(0)
+
+    const { data, isLoading, isError, isFetching } =
+        trpc.dailyChallenge.getLeaderboards.useQuery({ limit: PER_PAGE, cursor: page * PER_PAGE }, {
+            placeholderData: (prev) => prev
+        })
+    const { data: searchData, isLoading: isSearchLoading } = trpc.dailyChallenge.searchUser.useQuery({ query: search }, { enabled: !!search })
+
     const router = useRouter()
 
     const onSearch = useMemo(() => {
@@ -27,22 +30,18 @@ const Leaderboards = () => {
     }, [])
 
     const rowData = useMemo(() => {
-        if (!data?.pages) return []
-        console.log(isFetching, data.pages.find(p => p.page === page.page))
-        const usingPage = isFetching ? page.previousPage : page.page
-        const record = data.pages.find(p => p.page === usingPage)
-        if (!record) return []
-        return record.data.map((item, index) => ({
+        if (!data) return []
+        return data.data.map((item, index) => ({
             key: item.id,
             id: item.id,
-            rank: (PER_PAGE * usingPage) + index + 1,
+            rank: (PER_PAGE * page) + index + 1,
             username: item.username,
             country: item.country,
             played: item.played.count,
             top10Percent: item.top10Percent.count,
             top50Percent: item.top50Percent.count
         })) || []
-    }, [data, page, isFetching])
+    }, [data, page])
 
     if (isLoading) return <Loading fullPage />
     if (isError) return <div>Error loading leaderboards</div>
@@ -56,10 +55,8 @@ const Leaderboards = () => {
 
     const pagination: TablePaginationConfig = {
         onChange: (newPage) => {
-            console.log(data.pages.find(p => p.page === newPage-1))
-            if (!data.pages.find(p => p.page === newPage-1)) fetchNextPage({ pageParam: (newPage - 1) * PER_PAGE })
-            setPage({ page: newPage - 1, previousPage: page.page })
-        }, total: data.pages[0].total
+            setPage(newPage - 1)
+        }, total: data.total
     }
 
     return (
