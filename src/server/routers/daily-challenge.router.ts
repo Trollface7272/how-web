@@ -76,7 +76,7 @@ const dailyChallengeRouter = router({
             })
         )
         .query(async ({ input, ctx }) => {
-            const date = input.date ? new Date(input.date) : new Date()	
+            const date = new Date(input.date ?? moment().format("YYYY-MM-DD"))
             const [data] = (await dailyChallengeModel()
                 .aggregate([{
                     $match: {
