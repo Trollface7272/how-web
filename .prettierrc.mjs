@@ -5,4 +5,6 @@ export default {
   singleQuote: false,
   trailingComma: "all",
   semi: false,
+  arrowParens: "avoid",
+  bracketSpacing: true,
 }

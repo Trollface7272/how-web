@@ -91,7 +91,7 @@ const Filters = ({
             <div style={{ display: "flex", gap: 16, marginTop: 8 }}>
                 <DatePicker.RangePicker
                     value={[filters?.startDate, filters?.endDate]}
-                    onChange={(value) =>
+                    onChange={value =>
                         setFilters({
                             startDate: value?.[0],
                             endDate: value?.[1],
@@ -109,9 +109,9 @@ const Filters = ({
                         "Friday",
                         "Saturday",
                         "Sunday",
-                    ].map((item) => ({ label: item, value: item }))}
+                    ].map(item => ({ label: item, value: item }))}
                     value={filters?.weekday}
-                    onChange={(value) =>
+                    onChange={value =>
                         setFilters({ ...filters, weekday: value })
                     }
                     style={{ width: 140, textAlign: "center" }}
@@ -127,7 +127,7 @@ const Filters = ({
             >
                 <Switch
                     checked={settings.normalize}
-                    onChange={(value) =>
+                    onChange={value =>
                         setSettings({ ...settings, normalize: value })
                     }
                 />
@@ -140,7 +140,7 @@ const Filters = ({
 const ParticipationChart = ({ data }: { data: DailyChallengeData[] }) => {
     const router = useRouter()
 
-    const participationData = data.map((item) => ({
+    const participationData = data.map(item => ({
         name: moment(item.starts_at).format("DD MMM YYYY"),
         date: item.starts_at,
         total: item.total,
@@ -155,7 +155,7 @@ const ParticipationChart = ({ data }: { data: DailyChallengeData[] }) => {
         <ResponsiveContainer width={"100%"} height={400}>
             <LineChart
                 data={participationData}
-                onDoubleClick={(e) => onDoubleClick(e.activeIndex)}
+                onDoubleClick={e => onDoubleClick(e.activeIndex)}
             >
                 <Line type={"basis"} dataKey="total" dot={false} />
                 <YAxis />
@@ -173,12 +173,12 @@ const PlacementChart = ({ data }: { data: DailyChallengeData[] }) => {
 
     const handleLegendClick = (dataKey: string) => {
         if (hidden.includes(dataKey)) {
-            setHidden((prev) => prev.filter((key) => key !== dataKey))
+            setHidden(prev => prev.filter(key => key !== dataKey))
         } else {
-            setHidden((prev) => [...prev, dataKey])
+            setHidden(prev => [...prev, dataKey])
         }
     }
-    const placementData = data.map((item) => {
+    const placementData = data.map(item => {
         const multiplier = settings.normalize
             ? new Mods.ModList(
                   item.current_playlist_item.required_mods as Mods.BaseMod[],
@@ -206,7 +206,7 @@ const PlacementChart = ({ data }: { data: DailyChallengeData[] }) => {
         <ResponsiveContainer width={"100%"} height={400}>
             <LineChart
                 data={placementData}
-                onDoubleClick={(e) => onDoubleClick(e.activeIndex)}
+                onDoubleClick={e => onDoubleClick(e.activeIndex)}
             >
                 <Line
                     type={"linear"}
@@ -265,7 +265,7 @@ const PlacementChart = ({ data }: { data: DailyChallengeData[] }) => {
                 <YAxis domain={["auto", "auto"]} />
                 <Tooltip
                     contentStyle={{ backgroundColor: "black" }}
-                    formatter={(num) => num.toLocaleString()}
+                    formatter={num => num.toLocaleString()}
                 />
                 <XAxis dataKey="name" minTickGap={20} />
                 <Legend
@@ -278,7 +278,7 @@ const PlacementChart = ({ data }: { data: DailyChallengeData[] }) => {
                             {value}
                         </span>
                     )}
-                    onClick={(props) =>
+                    onClick={props =>
                         handleLegendClick(props.dataKey as string)
                     }
                 />
@@ -298,11 +298,11 @@ const ModsChart = ({ data }: { data: DailyChallengeData[] }) => {
             combinations: {},
         },
     }
-    data.forEach((item) => {
+    data.forEach(item => {
         const forcedMods = item.current_playlist_item.required_mods
         if (forcedMods.length === 0) return
         let combo = ""
-        forcedMods.forEach((mod) => {
+        forcedMods.forEach(mod => {
             if (!modAcronyms[mod.acronym as keyof typeof modAcronyms])
                 console.log(mod.acronym)
             if (modsData.forced.single[mod.acronym])
@@ -319,7 +319,7 @@ const ModsChart = ({ data }: { data: DailyChallengeData[] }) => {
             modsData.forced.combinations[combo].value++
         else modsData.forced.combinations[combo] = { name: combo, value: 1 }
         const usedMods = item.modData
-        Object.keys(usedMods?.single ?? []).forEach((mod) => {
+        Object.keys(usedMods?.single ?? []).forEach(mod => {
             if (modsData.used.single[mod])
                 modsData.used.single[mod].value += usedMods.single[mod].total
             else
@@ -329,7 +329,7 @@ const ModsChart = ({ data }: { data: DailyChallengeData[] }) => {
                     acronym: mod,
                 }
         })
-        Object.keys(usedMods?.combinations ?? []).forEach((combo) => {
+        Object.keys(usedMods?.combinations ?? []).forEach(combo => {
             if (modsData.used.combinations[combo])
                 modsData.used.combinations[combo].value +=
                     usedMods.combinations[combo].total
@@ -539,7 +539,7 @@ const PlayerRetention = ({ data }: { data: Record<number, number> }) => {
                 />
                 <XAxis interval={9} />
                 <Tooltip
-                    labelFormatter={(label) =>
+                    labelFormatter={label =>
                         participationData[label + 1]?.name ?? "unknown"
                     }
                     contentStyle={{ backgroundColor: "black" }}
@@ -563,7 +563,7 @@ const DailyChallengeStats = () => {
     const [settings, setSettings] = useState<settings>({ normalize: false })
 
     const filtered = useMemo(() => {
-        const dailyChallenge = data?.dailyChallenge?.filter((item) => {
+        const dailyChallenge = data?.dailyChallenge?.filter(item => {
             let ret = true
             const { startDate, endDate, weekday } = filters
             if (startDate && endDate)

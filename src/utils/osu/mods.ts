@@ -349,7 +349,7 @@ export namespace Mods {
         public get Formatted() {
             if (this.mods.length == 0) return "No Mod"
             const mods = this.mods
-                .map((mod) => {
+                .map(mod => {
                     if (mod.isSpeedChange() && !mod.isDefaultSpeedChange())
                         return `${mod.acronym}(${mod.settings.speed_change}x)`
                     return mod.acronym
@@ -359,19 +359,19 @@ export namespace Mods {
         }
 
         public Has(mod: string, flag?: string): boolean {
-            const hasMod = this.mods.find((m) => m.acronym == mod)
+            const hasMod = this.mods.find(m => m.acronym == mod)
 
             if (!flag || !hasMod) return hasMod !== undefined
             return !!hasMod.settings?.[flag as keyof typeof hasMod.settings]
         }
 
         public HasAny(mods: ModAcronyms[]): boolean {
-            return mods.some((mod) => this.Has(mod))
+            return mods.some(mod => this.Has(mod))
         }
 
         public GetSpeedChange(): number {
             return (
-                (this.mods.find((mod) => mod.isSpeedChange())?.settings
+                (this.mods.find(mod => mod.isSpeedChange())?.settings
                     ?.speed_change as number) ?? 1
             )
         }
@@ -381,7 +381,7 @@ export namespace Mods {
         }
 
         public GetDifficultyMods() {
-            const mods = this.mods.filter((mod) =>
+            const mods = this.mods.filter(mod =>
                 difficulty_mods.includes(mod.acronym),
             )
             if (
@@ -389,12 +389,12 @@ export namespace Mods {
                 this.Has(ModAcronyms.Hidden)
             ) {
                 mods.push(
-                    this.mods.find((mod) => mod.acronym == ModAcronyms.Hidden)!,
+                    this.mods.find(mod => mod.acronym == ModAcronyms.Hidden)!,
                 )
             }
             if (this.Has(ModAcronyms.DifficultyAdjust)) {
                 const mod = this.mods.find(
-                    (mod) => mod.acronym == ModAcronyms.DifficultyAdjust,
+                    mod => mod.acronym == ModAcronyms.DifficultyAdjust,
                 )!
                 const difficultyMod = new Mods.DifficultyAdjust(
                     ModAcronyms.DifficultyAdjust,

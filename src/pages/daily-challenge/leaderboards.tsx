@@ -20,7 +20,7 @@ const Leaderboards = () => {
         trpc.dailyChallenge.getLeaderboards.useQuery(
             { limit: PER_PAGE, cursor: page * PER_PAGE },
             {
-                placeholderData: (prev) => prev,
+                placeholderData: prev => prev,
             },
         )
     const { data: searchData, isLoading: isSearchLoading } =
@@ -67,7 +67,7 @@ const Leaderboards = () => {
     })
 
     const pagination: TablePaginationConfig = {
-        onChange: (newPage) => {
+        onChange: newPage => {
             setPage(newPage - 1)
         },
         total: data.total,
@@ -91,11 +91,11 @@ const Leaderboards = () => {
                         )
                     }
                     style={{ width: 200 }}
-                    options={searchData?.map((item) => ({
+                    options={searchData?.map(item => ({
                         label: item.username,
                         value: item.id,
                     }))}
-                    optionRender={(item) => (
+                    optionRender={item => (
                         <SearchSelectUserRow
                             username={item.label!.toString()}
                             id={item.value!.toString()}
@@ -122,7 +122,7 @@ const Leaderboards = () => {
                     dataIndex="country"
                     width={50}
                     key="country"
-                    render={(text) => (
+                    render={text => (
                         <div
                             style={{
                                 display: "flex",
@@ -141,7 +141,7 @@ const Leaderboards = () => {
                     dataIndex="id"
                     key="id"
                     width={50}
-                    render={(id) => (
+                    render={id => (
                         <Image
                             style={{ borderRadius: "50%" }}
                             alt="avatar"
@@ -168,18 +168,14 @@ const Leaderboards = () => {
                     dataIndex="rank1"
                     width={100}
                     key="rank1"
-                    render={(text) => (
-                        <span className="text-rank-1">{text}</span>
-                    )}
+                    render={text => <span className="text-rank-1">{text}</span>}
                 />
                 <Table.Column
                     title="Top 1%"
                     dataIndex="top1"
                     width={100}
                     key="top1"
-                    render={(text) => (
-                        <span className="text-top-1">{text}</span>
-                    )}
+                    render={text => <span className="text-top-1">{text}</span>}
                 />
                 {/* <Table.Column title="Top 5%" dataIndex="top5" width={100} key="top5" /> */}
                 <Table.Column
@@ -187,18 +183,14 @@ const Leaderboards = () => {
                     dataIndex="top10"
                     width={100}
                     key="top10"
-                    render={(text) => (
-                        <span className="text-top-10">{text}</span>
-                    )}
+                    render={text => <span className="text-top-10">{text}</span>}
                 />
                 {/* <Table.Column title="Top 25%" dataIndex="top25" width={100} key="top25" /> */}
                 <Table.Column
                     title="Top 50%"
                     dataIndex="top50"
                     key="top50"
-                    render={(text) => (
-                        <span className="text-top-50">{text}</span>
-                    )}
+                    render={text => <span className="text-top-50">{text}</span>}
                 />
                 {/* <Table.Column title="Top 75%" dataIndex="top75" key="top75" /> */}
             </Table>

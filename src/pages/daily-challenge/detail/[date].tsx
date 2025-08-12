@@ -42,7 +42,7 @@ const DailyChallengePicker = () => {
             minDate={dayjs(firstDailyChallengeDate().toDate())}
             allowClear={false}
             maxDate={dayjs()}
-            onChange={(d) => {
+            onChange={d => {
                 if (d) {
                     router?.push(
                         `/daily-challenge/detail/${d.format("YYYY-MM-DD")}`,
@@ -114,7 +114,7 @@ const BeatmapInfo = ({
                     <span
                         style={{ fontSize: 32, marginLeft: 8, display: "flex" }}
                     >
-                        {required_mods?.map((mod) => (
+                        {required_mods?.map(mod => (
                             <Mod key={mod.acronym} mod={mod} />
                         ))}
                     </span>
@@ -196,7 +196,7 @@ const BeatmapInfo = ({
 }
 
 const ParticipationGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
-    const data = thresholds.map((threshold) => ({
+    const data = thresholds.map(threshold => ({
         date: moment(threshold.date).format("HH:mm"),
         total: threshold.total,
         top10: threshold.top10.position,
@@ -234,7 +234,7 @@ const ParticipationGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
                 <YAxis />
                 <Tooltip
                     contentStyle={{ backgroundColor: "black" }}
-                    formatter={(num) => num.toLocaleString()}
+                    formatter={num => num.toLocaleString()}
                 />
                 <Legend />
             </LineChart>
@@ -244,7 +244,7 @@ const ParticipationGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
 
 const ThresholdsGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
     const [hidden, setHidden] = useState<string[]>(["top1", "top25", "top75"])
-    const data = thresholds.map((threshold) => ({
+    const data = thresholds.map(threshold => ({
         date: moment(threshold.date).format("HH:mm"),
         rank1: threshold?.rank1?.score,
         top1: threshold?.top1?.score,
@@ -256,9 +256,9 @@ const ThresholdsGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
 
     const handleLegendClick = (dataKey: string) => {
         if (hidden.includes(dataKey)) {
-            setHidden((prev) => prev.filter((key) => key !== dataKey))
+            setHidden(prev => prev.filter(key => key !== dataKey))
         } else {
-            setHidden((prev) => [...prev, dataKey])
+            setHidden(prev => [...prev, dataKey])
         }
     }
 
@@ -323,10 +323,10 @@ const ThresholdsGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
                 <YAxis domain={["auto", "auto"]} />
                 <Tooltip
                     contentStyle={{ backgroundColor: "black" }}
-                    formatter={(num) => num.toLocaleString()}
+                    formatter={num => num.toLocaleString()}
                 />
                 <Legend
-                    onClick={(props) =>
+                    onClick={props =>
                         handleLegendClick(props.dataKey as string)
                     }
                 />

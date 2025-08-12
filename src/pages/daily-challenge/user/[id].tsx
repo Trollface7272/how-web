@@ -87,7 +87,7 @@ const Participation = ({
         return [undefined, undefined]
     }, [filter])
 
-    scores.forEach((score) => {
+    scores.forEach(score => {
         if (
             from &&
             from >= moment(score.date) &&
@@ -139,10 +139,10 @@ const Participation = ({
                 <Select
                     style={{ width: 100 }}
                     value={filter}
-                    onChange={(value) => setFilter(value as number)}
+                    onChange={value => setFilter(value as number)}
                 >
                     <Select.Option value={null}>Last year</Select.Option>
-                    {years.map((el) => (
+                    {years.map(el => (
                         <Select.Option key={el} value={el}>
                             {el}
                         </Select.Option>
@@ -166,7 +166,7 @@ const Participation = ({
 const Score = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
     const router = useRouter()
     const data = useMemo(() => {
-        return scores.map((score) => {
+        return scores.map(score => {
             return {
                 score: score.score,
                 date: moment(score.date).format("DD MMM YYYY"),
@@ -183,7 +183,7 @@ const Score = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
         <ResponsiveContainer width={"100%"} height={400}>
             <LineChart
                 data={data}
-                onDoubleClick={(e) => onDoubleClick(e.activeIndex)}
+                onDoubleClick={e => onDoubleClick(e.activeIndex)}
             >
                 <Line
                     type="linear"
@@ -197,7 +197,7 @@ const Score = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
                 <YAxis dataKey="score" />
                 <Tooltip
                     contentStyle={{ backgroundColor: "black" }}
-                    formatter={(num) => num.toLocaleString()}
+                    formatter={num => num.toLocaleString()}
                 />
             </LineChart>
         </ResponsiveContainer>
@@ -207,7 +207,7 @@ const Score = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
 const Placement = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
     const router = useRouter()
     const data = useMemo(() => {
-        return scores.map((score) => {
+        return scores.map(score => {
             return {
                 placement: score.position,
                 placementText: `#${score.position} (${score.positionPercent.toFixed(2)}%)`,
@@ -225,7 +225,7 @@ const Placement = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
         <ResponsiveContainer width={"100%"} height={400}>
             <LineChart
                 data={data}
-                onDoubleClick={(e) => onDoubleClick(e.activeIndex)}
+                onDoubleClick={e => onDoubleClick(e.activeIndex)}
             >
                 <Line
                     type="linear"

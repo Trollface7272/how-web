@@ -60,7 +60,7 @@ const dailyChallengeRouter = router({
             total: {},
             country: {},
         }
-        rawUserData.forEach((user) => {
+        rawUserData.forEach(user => {
             retentionData.total[user.played.count] ??= 0
             retentionData.total[user.played.count]++
             retentionData.country[user.country] ??= {}
@@ -150,7 +150,7 @@ const dailyChallengeRouter = router({
                     ])
                     .optional()
                     .default("top100")
-                    .transform((value) => {
+                    .transform(value => {
                         return `placements.${value}.count`
                     }),
                 cursor: z.number().nullish(),

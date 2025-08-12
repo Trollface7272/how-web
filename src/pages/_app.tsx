@@ -63,7 +63,7 @@ const ProfileButton = (collapsed: boolean) => {
         key: "/daily-challenge/user/" + user.osu?.userId,
         extra: (
             <LogoutOutlined
-                onClick={async (e) => {
+                onClick={async e => {
                     e.stopPropagation()
                     await fetch("/api/logout")
                     user.refetch()
@@ -85,7 +85,7 @@ const SideMenu = () => {
             ...MenuItems,
         ]
         const group = items.find(
-            (el) => el?.key === "daily-challenge-group",
+            el => el?.key === "daily-challenge-group",
         ) as MenuItemGroupType<MenuItemType>
         group!.className = collapsed ? "group-title-text-hidden" : ""
         return items
@@ -100,7 +100,7 @@ const SideMenu = () => {
         <Sider
             collapsible
             collapsed={collapsed}
-            onCollapse={(value) => setCollapsed(value)}
+            onCollapse={value => setCollapsed(value)}
         >
             <Menu
                 defaultSelectedKeys={[href]}
@@ -108,7 +108,7 @@ const SideMenu = () => {
                 mode="inline"
                 style={{ minHeight: "100vh" }}
                 items={menuItems}
-                onClick={(item) => onClick(item.key)}
+                onClick={item => onClick(item.key)}
             />
         </Sider>
     )

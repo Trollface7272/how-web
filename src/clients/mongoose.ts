@@ -13,6 +13,6 @@ const dbConnect = async () => {
     })
 }
 
-dbConnect().catch((err) => console.log(err))
+dbConnect().catch(err => console.log(err))
 
 export default dbConnect

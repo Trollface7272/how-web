@@ -113,7 +113,7 @@ export const Matrix = ({
         <div className="matrix">
             <MatrixRow>{chart}</MatrixRow>
             <Row className="justify-center" style={{ marginTop: 16 }}>
-                {legendData.map((item) => (
+                {legendData.map(item => (
                     <div
                         key={item.label}
                         style={{ paddingLeft: 8, paddingRight: 8 }}
