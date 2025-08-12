@@ -1,13 +1,13 @@
-import * as trpcNext from "@trpc/server/adapters/next";
-import dbConnect from "../../../clients/mongoose";
-import { appRouter } from "../../../server/routers/_app";
+import * as trpcNext from "@trpc/server/adapters/next"
+import dbConnect from "../../../clients/mongoose"
+import { appRouter } from "../../../server/routers/_app"
 // export API handler
 export default trpcNext.createNextApiHandler({
-  router: appRouter,
-  createContext: async ({req, res}) => {
-    await dbConnect();
-    return {
-        cookies: req.cookies
-    };
-  },
-});
+    router: appRouter,
+    createContext: async ({ req, res }) => {
+        await dbConnect()
+        return {
+            cookies: req.cookies,
+        }
+    },
+})

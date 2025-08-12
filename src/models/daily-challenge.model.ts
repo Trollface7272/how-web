@@ -1,6 +1,5 @@
-import mongoose, { Model, model, Schema } from "mongoose";
-import { IDailyChallenge } from "../types/daily-challenge";
-
+import mongoose, { Model, model, Schema } from "mongoose"
+import { IDailyChallenge } from "../types/daily-challenge"
 
 const userSchema = new Schema<IDailyChallenge>({
     active: {
@@ -44,7 +43,7 @@ const userSchema = new Schema<IDailyChallenge>({
             bpm: { type: Number, default: 0.0 },
             convert: { type: Boolean, default: false },
             count_circles: { type: Number, default: null },
-        }
+        },
     },
     difficulty_range: {
         type: {
@@ -97,7 +96,7 @@ const userSchema = new Schema<IDailyChallenge>({
         type: {
             count_active: Number,
             count_total: Number,
-            ruleset_ids: [Number]
+            ruleset_ids: [Number],
         },
         default: {},
     },
@@ -105,12 +104,14 @@ const userSchema = new Schema<IDailyChallenge>({
         type: String,
         default: "normal",
     },
-    recent_participants: [{
-        id: { type: Number, required: true },
-        username: { type: String, required: true },
-        score: { type: Number, default: 0 },
-        rank: { type: String, default: "X" },
-    }],
+    recent_participants: [
+        {
+            id: { type: Number, required: true },
+            username: { type: String, required: true },
+            score: { type: Number, default: 0 },
+            rank: { type: String, default: "X" },
+        },
+    ],
     starts_at: {
         type: Date,
         required: true,
@@ -132,22 +133,24 @@ const userSchema = new Schema<IDailyChallenge>({
         default: Date.now,
     },
     thresholds: {
-        type: [{
-            date: { type: Date, required: true },
-            top10: {
-                position: { type: Number, required: true },
-                score: { type: Number, required: true },
+        type: [
+            {
+                date: { type: Date, required: true },
+                top10: {
+                    position: { type: Number, required: true },
+                    score: { type: Number, required: true },
+                },
+                top50: {
+                    position: { type: Number, required: true },
+                    score: { type: Number, required: true },
+                },
+                rank1: {
+                    position: { type: Number, required: true },
+                    score: { type: Number, required: true },
+                },
+                total: { type: Number, required: true },
             },
-            top50: {
-                position: { type: Number, required: true },
-                score: { type: Number, required: true },
-            },
-            rank1: {
-                position: { type: Number, required: true },
-                score: { type: Number, required: true },
-            },
-            total: { type: Number, required: true },
-        }],
+        ],
         default: [],
     },
     modData: {
@@ -157,17 +160,20 @@ const userSchema = new Schema<IDailyChallenge>({
             },
             combinations: {
                 type: Schema.Types.Mixed,
-            }
+            },
         },
         default: {
             single: {},
             combinations: {},
         },
-    }
-});
+    },
+})
 
 const dailyChallengeModel = (): Model<IDailyChallenge> => {
-    return mongoose.models?.DailyChallenge || model<IDailyChallenge>("DailyChallenge", userSchema, "dailychallenge")
-};
+    return (
+        mongoose.models?.DailyChallenge ||
+        model<IDailyChallenge>("DailyChallenge", userSchema, "dailychallenge")
+    )
+}
 
-export default dailyChallengeModel;
+export default dailyChallengeModel

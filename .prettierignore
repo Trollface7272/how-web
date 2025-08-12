@@ -1,0 +1,16 @@
+# editor config files
+.vscode
+.cursor
+.husky
+
+# build files and dependencies
+.next
+node_modules
+
+# public files
+public
+
+# env files
+.env.*
+next-env.d.ts
+*.yaml

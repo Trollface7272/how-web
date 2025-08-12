@@ -1,85 +1,115 @@
-import "../styles/globals.css";
-import "../styles/mods.css";
-import type { AppProps } from "next/app";
-import { Avatar, ConfigProvider, Layout, Menu, theme } from "antd";
-import { useContext, useEffect, useState } from "react";
-import { LoginOutlined, LogoutOutlined } from "@ant-design/icons";
-const { Content, Sider } = Layout;
-import { trpc } from "../utils/trpc";
-import Link from "next/link";
+import "../styles/globals.css"
+import type { AppProps } from "next/app"
+import { Avatar, ConfigProvider, Layout, Menu, MenuProps, theme } from "antd"
+import { useContext, useEffect, useMemo, useState } from "react"
+import {
+    BarChartOutlined,
+    CalendarOutlined,
+    LoginOutlined,
+    LogoutOutlined,
+    TrophyOutlined,
+} from "@ant-design/icons"
+const { Content, Sider } = Layout
+import { trpc } from "../utils/trpc"
 import { usePathname } from "next/navigation"
-import { IUserContext } from "../models/user.model";
-import { UserContext } from "../context/User";
-import { Row } from "../components/Row";
+import { IUserContext } from "../models/user.model"
+import { UserContext } from "../context/User"
+import { MenuItemGroupType, MenuItemType } from "antd/es/menu/interface"
+import { useRouter } from "next/router"
+
+type MenuItem = Required<MenuProps>["items"][number]
+
+const MenuItems: MenuItem[] = [
+    {
+        label: "Daily challenge",
+        type: "group",
+        key: "daily-challenge-group",
+        children: [
+            {
+                label: "Stats",
+                key: "/daily-challenge/stats",
+                icon: <BarChartOutlined />,
+            },
+            {
+                label: "Current",
+                key: "/daily-challenge/detail/current",
+                icon: <CalendarOutlined />,
+            },
+            {
+                label: "Leaderboards",
+                key: "/daily-challenge/leaderboards",
+                icon: <TrophyOutlined />,
+            },
+        ],
+    },
+]
 
 const LoginButton = () => {
-    return (
-        <Menu.Item key="logged-user" style={{ paddingLeft: "24px" }}>
-            <Link href={process.env.NEXT_PUBLIC_OSU_LINK_URL!}>
-                <LoginOutlined />
-                <span>Log In</span>
-            </Link>
-        </Menu.Item>
-    )
+    return {
+        label: "Login",
+        key: "/login",
+        icon: <LoginOutlined />,
+        onClick: () => {
+            window.location.href = process.env.NEXT_PUBLIC_OSU_LINK_URL!
+        },
+    }
 }
-const ProfileButton = () => {
+const ProfileButton = (collapsed: boolean) => {
     const user = useContext<IUserContext | null>(UserContext)!
-    return (
-        <Menu.Item key={`/daily-challenge/user/${user.osu?.userId}`}>
-            <Row>
-                <Link href={`/daily-challenge/user/${user.osu?.userId}`} style={{ width: "100%", height: "100%", display: "flex", alignItems: "center" }}>
-                    <Avatar style={{ marginLeft: 18, height: 24, width: 24 }} alt="Avatar" src={`https://a.ppy.sh/${user.osu?.userId}`} />
-                    <span style={{ fontSize: 14, marginLeft: 5 }}>{user.osu?.username}</span>
-                </Link>
-                <LogoutOutlined style={{ zIndex: 1000 }} onClick={async (e) => {
+    return {
+        className: collapsed ? "avatar-collapsed" : "",
+        label: user.osu?.username,
+        icon: <Avatar src={`https://a.ppy.sh/${user.osu?.userId}`} />,
+        key: "/daily-challenge/user/" + user.osu?.userId,
+        extra: (
+            <LogoutOutlined
+                onClick={async (e) => {
                     e.stopPropagation()
                     await fetch("/api/logout")
                     user.refetch()
-                }} />
-            </Row>
-        </Menu.Item>
-    )
+                }}
+            />
+        ),
+    } as MenuItem
 }
-
 
 const SideMenu = () => {
     const href = usePathname() ?? ""
-    // const [collapsed, setCollapsed] = useState(false);
+    const [collapsed, setCollapsed] = useState(false)
     const user = useContext<IUserContext | null>(UserContext)
+    const router = useRouter()
+
+    const menuItems = useMemo(() => {
+        const items = [
+            user?.id ? ProfileButton(collapsed) : LoginButton(),
+            ...MenuItems,
+        ]
+        const group = items.find(
+            (el) => el?.key === "daily-challenge-group",
+        ) as MenuItemGroupType<MenuItemType>
+        group!.className = collapsed ? "group-title-text-hidden" : ""
+        return items
+    }, [MenuItems, user, collapsed])
+
+    const onClick = (path: string) => {
+        if (path === "/login") return
+        router.push(path)
+    }
 
     return (
         <Sider
-            // collapsible
-            // collapsed={collapsed}
-            // onCollapse={(value) => setCollapsed(value)}
+            collapsible
+            collapsed={collapsed}
+            onCollapse={(value) => setCollapsed(value)}
         >
-
-
             <Menu
                 defaultSelectedKeys={[href]}
                 defaultOpenKeys={["daily-challenge-group"]}
                 mode="inline"
                 style={{ minHeight: "100vh" }}
-            >
-                {user?.id ? <ProfileButton /> : <LoginButton />}
-                <Menu.SubMenu key={"daily-challenge-group"} title="Daily challenge">
-                    <Menu.Item key="/daily-challenge/stats">
-                        <Link href="/daily-challenge/stats">
-                            <span>Stats</span>
-                        </Link>
-                    </Menu.Item>
-                    <Menu.Item key="/daily-challenge/detail/current">
-                        <Link href="/daily-challenge/detail/current">
-                            <span>Current</span>
-                        </Link>
-                    </Menu.Item>
-                    <Menu.Item key="/daily-challenge/leaderboards">
-                        <Link href="/daily-challenge/leaderboards">
-                            <span>Leaderboards</span>
-                        </Link>
-                    </Menu.Item>
-                </Menu.SubMenu>
-            </Menu>
+                items={menuItems}
+                onClick={(item) => onClick(item.key)}
+            />
         </Sider>
     )
 }
@@ -90,32 +120,42 @@ const App = ({ Component, pageProps }: AppProps) => {
         algorithm: theme.darkAlgorithm,
         token: {
             colorBgContainer: "#141414",
+        },
+    }
+
+    const refetch = async () => {
+        _refetch()
+    }
+
+    if (typeof window !== "undefined") {
+        window.onload = () => {
+            document.getElementById("holderStyle")!.remove()
         }
     }
 
-    const refetch = async () => { _refetch() }
-
-    if (typeof window !== 'undefined') {
-        window.onload = () => {
-            document.getElementById('holderStyle')!.remove();
-        };
-    }
-
     useEffect(() => {
-        document.getElementById('holderStyle')?.remove();
+        document.getElementById("holderStyle")?.remove()
     })
 
     return (
-        <UserContext.Provider value={user ? {
-            ...user,
-            refetch
-        } : { refetch }}>
-            <ConfigProvider theme={t} >
+        <UserContext.Provider
+            value={
+                user
+                    ? {
+                          ...user,
+                          refetch,
+                      }
+                    : { refetch }
+            }
+        >
+            <ConfigProvider theme={t}>
                 <Layout style={{ minHeight: "100vh" }}>
-
                     <SideMenu />
 
-                    <Layout className="site-layout" style={{ overflowY: "scroll", overflowX: "hidden" }}>
+                    <Layout
+                        className="site-layout"
+                        style={{ overflowY: "scroll", overflowX: "hidden" }}
+                    >
                         <Content style={{ margin: "0 16px" }}>
                             <Component {...pageProps} />
                         </Content>
@@ -123,7 +163,7 @@ const App = ({ Component, pageProps }: AppProps) => {
                 </Layout>
             </ConfigProvider>
         </UserContext.Provider>
-    );
-};
+    )
+}
 
-export default trpc.withTRPC(App);
+export default trpc.withTRPC(App)

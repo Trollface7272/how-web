@@ -1,6 +1,5 @@
-import mongoose, { Model, model, Schema } from "mongoose";
-import { IDailyChallengeUser } from "../types/daily-challenge-profile";
-
+import mongoose, { Model, model, Schema } from "mongoose"
+import { IDailyChallengeUser } from "../types/daily-challenge-profile"
 
 const userSchema = new Schema<IDailyChallengeUser>({
     _id: {
@@ -52,11 +51,93 @@ const userSchema = new Schema<IDailyChallengeUser>({
     username: {
         type: String,
         required: true,
-    }
-});
+    },
+    streakData: {
+        type: {
+            currentStreak: Number,
+            longestStreak: Number,
+            streakHistory: [{}],
+            updatedForChallenge: Number,
+        },
+    },
+    placements: {
+        type: {
+            rank1: {
+                type: {
+                    rooms: [Number],
+                    count: Number,
+                },
+                required: true,
+            },
+            top1: {
+                type: {
+                    rooms: [Number],
+                    count: Number,
+                },
+                required: true,
+            },
+            top5: {
+                type: {
+                    rooms: [Number],
+                    count: Number,
+                },
+                required: true,
+            },
+            top10: {
+                type: {
+                    rooms: [Number],
+                    count: Number,
+                },
+                required: true,
+            },
+            top25: {
+                type: {
+                    rooms: [Number],
+                    count: Number,
+                },
+                required: true,
+            },
+            top50: {
+                type: {
+                    rooms: [Number],
+                    count: Number,
+                },
+                required: true,
+            },
+            top75: {
+                type: {
+                    rooms: [Number],
+                    count: Number,
+                },
+                required: true,
+            },
+            top100: {
+                type: {
+                    rooms: [Number],
+                    count: Number,
+                },
+                required: true,
+            },
+        },
+        required: true,
+    },
+    statistics: {
+        type: {
+            total_score: Number,
+        },
+        required: true,
+    },
+})
 
 const dailyChallengeUserModel = (): Model<IDailyChallengeUser> => {
-  return mongoose.models?.DailyChallengeUser || model<IDailyChallengeUser>("DailyChallengeUser", userSchema, "dailychallengeprofile")
-};
+    return (
+        mongoose.models?.DailyChallengeUser ||
+        model<IDailyChallengeUser>(
+            "DailyChallengeUser",
+            userSchema,
+            "dailychallengeprofile",
+        )
+    )
+}
 
-export default dailyChallengeUserModel;
+export default dailyChallengeUserModel

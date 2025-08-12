@@ -1,11 +1,11 @@
-import mongoose, { Model, model, Schema } from "mongoose";
+import mongoose, { Model, model, Schema } from "mongoose"
 
 export interface IUser {
     id: string
     username: string
     blacklisted: boolean
-    commands: number,
-    embedColor: null | string,
+    commands: number
+    embedColor: null | string
     firstSeen: Date
     knownIps: string[]
     lastSeen: Date
@@ -18,7 +18,7 @@ export interface IUser {
     }
     osu?: {
         token: string
-        tokenType: "Bearer",
+        tokenType: "Bearer"
         expiresIn: Date
         refreshToken: string
         scopes: string[]
@@ -31,7 +31,9 @@ export interface IUser {
     }
 }
 
-export type IClientUser = Partial<Pick<IUser, "id" | "username">> & { osu?: { username: string, userId: number } }
+export type IClientUser = Partial<Pick<IUser, "id" | "username">> & {
+    osu?: { username: string; userId: number }
+}
 
 export type IUserContext = IClientUser & {
     refetch: () => Promise<void>
@@ -40,11 +42,11 @@ export type IUserContext = IClientUser & {
 const userSchema = new Schema<IUser>({
     id: {
         type: String,
-        required: true
+        required: true,
     },
     username: {
         type: String,
-        required: true
+        required: true,
     },
     blacklisted: {
         type: Boolean,
@@ -137,11 +139,11 @@ const userSchema = new Schema<IUser>({
             type: Number,
             default: 0,
         },
-    }
-});
+    },
+})
 
 const userModel = (): Model<IUser> => {
     return mongoose.models?.User || model<IUser>("User", userSchema, "users")
-};
+}
 
-export default userModel;
+export default userModel

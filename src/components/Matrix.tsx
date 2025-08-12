@@ -1,8 +1,8 @@
-import { Tooltip } from "antd";
+import { Tooltip } from "antd"
 import Moment from "moment"
-import { extendMoment } from 'moment-range';
-import { ReactNode, useMemo } from "react";
-import { Row } from "./Row";
+import { extendMoment } from "moment-range"
+import { ReactNode, useMemo } from "react"
+import { Row } from "./Row"
 
 //@ts-ignore
 const moment = extendMoment(Moment)
@@ -18,36 +18,54 @@ export interface IMatrixData {
 }
 
 export const MatrixRow = ({ children }: { children: React.ReactNode }) => {
-    return (
-        <div className="matrix-row">
-            {children}
-        </div>
-    )
+    return <div className="matrix-row">{children}</div>
 }
 
 export const MatrixColumn = ({ children }: { children: React.ReactNode }) => {
-    return (
-        <div className="matrix-column">
-            {children}
-        </div>
-    )
+    return <div className="matrix-column">{children}</div>
 }
 
-export const MatrixCell = ({ children, data, onDoubleClick }: { children?: React.ReactNode, data: ICellData, onDoubleClick: (data: ICellData) => void }) => {
+export const MatrixCell = ({
+    children,
+    data,
+    onDoubleClick,
+}: {
+    children?: React.ReactNode
+    data: ICellData
+    onDoubleClick: (data: ICellData) => void
+}) => {
     return (
         <Tooltip title={data?.Tooltip}>
-            <div onDoubleClick={() => onDoubleClick(data)} className="matrix-cell" style={{ background: data?.color }}>
+            <div
+                onDoubleClick={() => onDoubleClick(data)}
+                className="matrix-cell"
+                style={{ background: data?.color }}
+            >
                 {children}
             </div>
         </Tooltip>
     )
 }
 
-
-export const Matrix = (
-    { data, legendData, defaultColor, from, to, minDate, maxDate, onDoubleClick }:
-        { data: IMatrixData, legendData: { color: string, label: string }[], defaultColor: string, from?: Moment.Moment, to?: Moment.Moment, minDate?: Moment.Moment, maxDate?: Moment.Moment, onDoubleClick: (data: ICellData) => void }) => {
-
+export const Matrix = ({
+    data,
+    legendData,
+    defaultColor,
+    from,
+    to,
+    minDate,
+    maxDate,
+    onDoubleClick,
+}: {
+    data: IMatrixData
+    legendData: { color: string; label: string }[]
+    defaultColor: string
+    from?: Moment.Moment
+    to?: Moment.Moment
+    minDate?: Moment.Moment
+    maxDate?: Moment.Moment
+    onDoubleClick: (data: ICellData) => void
+}) => {
     const chart = useMemo(() => {
         const cellData = data.CellData
         const cellDataArray = Object.keys(cellData)
@@ -56,7 +74,9 @@ export const Matrix = (
         })
 
         const toDate = to ? to : moment().endOf("week")
-        const fromDate = from ? from : moment(toDate).add(-365, "days").startOf("week")
+        const fromDate = from
+            ? from
+            : moment(toDate).add(-365, "days").startOf("week")
         const weeks = moment.range(fromDate, toDate)
         const iterator = weeks.by("week")
         const matrix = []
@@ -68,13 +88,22 @@ export const Matrix = (
                 if (maxDate && day.isSameOrAfter(maxDate)) dColor = "gray"
                 if (minDate && day.isBefore(minDate)) dColor = "gray"
                 row.push(
-                    <MatrixCell onDoubleClick={onDoubleClick} data={data.CellData[day.format("YYYY-MM-DD")] || { date: day.toDate(), color: dColor }} key={day.format("YYYY-MM-DD")}></MatrixCell>
+                    <MatrixCell
+                        onDoubleClick={onDoubleClick}
+                        data={
+                            data.CellData[day.format("YYYY-MM-DD")] || {
+                                date: day.toDate(),
+                                color: dColor,
+                            }
+                        }
+                        key={day.format("YYYY-MM-DD")}
+                    ></MatrixCell>,
                 )
             }
             matrix.push(
                 <MatrixColumn key={week.format("YYYY-MM-DD")}>
                     {row}
-                </MatrixColumn>
+                </MatrixColumn>,
             )
         }
         return matrix
@@ -82,13 +111,23 @@ export const Matrix = (
 
     return (
         <div className="matrix">
-            <MatrixRow>
-                {chart}
-            </MatrixRow>
+            <MatrixRow>{chart}</MatrixRow>
             <Row className="justify-center" style={{ marginTop: 16 }}>
                 {legendData.map((item) => (
-                    <div key={item.label} style={{ paddingLeft: 8, paddingRight: 8 }}>
-                        <span style={{ background: item.color, borderRadius: 4, width: 16, height: 16, display: "inline-block", marginRight: 4 }}></span>
+                    <div
+                        key={item.label}
+                        style={{ paddingLeft: 8, paddingRight: 8 }}
+                    >
+                        <span
+                            style={{
+                                background: item.color,
+                                borderRadius: 4,
+                                width: 16,
+                                height: 16,
+                                display: "inline-block",
+                                marginRight: 4,
+                            }}
+                        ></span>
                         {item.label}
                     </div>
                 ))}

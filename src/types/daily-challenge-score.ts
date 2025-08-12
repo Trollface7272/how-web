@@ -1,6 +1,3 @@
-
-
-
 export interface IDailyChallengeScore {
     id: number
     room_id: number
@@ -41,9 +38,9 @@ export interface IDailyChallengeScore {
     total_score_without_mods: number
     type: string
     user_id: number
-  }
-  
-  export interface User {
+}
+
+export interface User {
     avatar_url: string
     country_code: string
     default_group: string
@@ -59,43 +56,42 @@ export interface IDailyChallengeScore {
     username: string
     country: Country
     cover: Cover
-  }
-  
-  export interface Country {
+}
+
+export interface Country {
     code: string
     name: string
-  }
-  
-  export interface Cover {
+}
+
+export interface Cover {
     custom_url: string
     url: string
     id: any
-  }
-  
-  export interface CurrentUserAttributes {
+}
+
+export interface CurrentUserAttributes {
     pin: any
-  }
-  
-  export interface MaximumStatistics {
+}
+
+export interface MaximumStatistics {
     great: number
     ignore_hit: number
     large_tick_hit: number
     slider_tail_hit: number
-  }
-  
-  export interface Mod {
+}
+
+export interface Mod {
     acronym: string
     settings?: Settings
-  }
-  
-  export interface Settings {
+}
+
+export interface Settings {
     speed_change: number
-  }
-  
-  export interface Statistics {
+}
+
+export interface Statistics {
     great: number
     ignore_hit: number
     large_tick_hit: number
     slider_tail_hit: number
-  }
-  
+}

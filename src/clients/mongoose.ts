@@ -1,18 +1,18 @@
-import cache from 'ts-cache-mongoose'
-import mongoose from "mongoose";
+import cache from "ts-cache-mongoose"
+import mongoose from "mongoose"
 
 const dbConnect = async () => {
-  if (!process.env.MONGODB_URI) {
-    throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
-  }
-  const uri = process.env.MONGODB_URI;
-  await mongoose.connect(uri);
-  mongoose.set("strictQuery", true);
-  cache.init(mongoose, {
-    engine: "memory"
-  })
-};
+    if (!process.env.MONGODB_URI) {
+        throw new Error('Invalid/Missing environment variable: "MONGODB_URI"')
+    }
+    const uri = process.env.MONGODB_URI
+    await mongoose.connect(uri)
+    mongoose.set("strictQuery", true)
+    cache.init(mongoose, {
+        engine: "memory",
+    })
+}
 
-dbConnect().catch((err) => console.log(err));
+dbConnect().catch((err) => console.log(err))
 
-export default dbConnect;
+export default dbConnect

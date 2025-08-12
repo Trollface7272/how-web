@@ -1,15 +1,33 @@
 const difficulty_mods = [
-    "EZ", "HT", "DC", "TD",
-    "HR", "DT", "NC", "FL",
-    "RX", "TP", "CL",
-    "RD", "WU", "WD",
-    "4K", "5K", "6K", "7K",
-    "8K", "FI", "RD", "1K",
-    "2K", "3K", "9K", "V2",
+    "EZ",
+    "HT",
+    "DC",
+    "TD",
+    "HR",
+    "DT",
+    "NC",
+    "FL",
+    "RX",
+    "TP",
+    "CL",
+    "RD",
+    "WU",
+    "WD",
+    "4K",
+    "5K",
+    "6K",
+    "7K",
+    "8K",
+    "FI",
+    "RD",
+    "1K",
+    "2K",
+    "3K",
+    "9K",
+    "V2",
 ]
 
 export namespace Mods {
-
     export enum modMultipliers {
         EZ = 0.5,
         NF = 0.5,
@@ -59,7 +77,7 @@ export namespace Mods {
         BU = 1,
         SY = 0.8,
         DP = 1,
-        BM = 1
+        BM = 1,
     }
 
     export enum ModAcronyms {
@@ -125,35 +143,56 @@ export namespace Mods {
         DT = 1.5,
         HT = 0.75,
         NC = 1.5,
-        DC = 0.75
+        DC = 0.75,
     }
     export class BaseMod {
         public acronym!: string
         public settings!: { [key: string]: string | number | boolean }
 
-        constructor(mod: string | BaseMod, settings?: { [key: string]: string | number | boolean }) {
+        constructor(
+            mod: string | BaseMod,
+            settings?: { [key: string]: string | number | boolean },
+        ) {
             if (typeof mod == "string") {
                 this.acronym = mod
                 this.settings = settings ?? {}
             } else {
                 Object.assign(this, mod)
             }
-            if (this.isSpeedChange() && !this.settings) this.settings = { speed_change: DefaultSpeedChange[this.acronym as keyof typeof DefaultSpeedChange] ?? 1 }
+            if (this.isSpeedChange() && !this.settings)
+                this.settings = {
+                    speed_change:
+                        DefaultSpeedChange[
+                            this.acronym as keyof typeof DefaultSpeedChange
+                        ] ?? 1,
+                }
         }
 
         public isSpeedChange(): this is SpeedAdjustMod {
-            return this.acronym == ModAcronyms.DoubleTime || this.acronym == ModAcronyms.HalfTime || this.acronym == ModAcronyms.Nightcore || this.acronym == ModAcronyms.DayCore
+            return (
+                this.acronym == ModAcronyms.DoubleTime ||
+                this.acronym == ModAcronyms.HalfTime ||
+                this.acronym == ModAcronyms.Nightcore ||
+                this.acronym == ModAcronyms.DayCore
+            )
         }
 
         public isDefaultSpeedChange() {
-            return !this.settings?.speed_change || (this.settings?.speed_change == DefaultSpeedChange[this.acronym as keyof typeof DefaultSpeedChange])
+            return (
+                !this.settings?.speed_change ||
+                this.settings?.speed_change ==
+                    DefaultSpeedChange[
+                        this.acronym as keyof typeof DefaultSpeedChange
+                    ]
+            )
         }
 
         public getMultiplier() {
-            return modMultipliers[this.acronym as keyof typeof modMultipliers] ?? 0
+            return (
+                modMultipliers[this.acronym as keyof typeof modMultipliers] ?? 0
+            )
         }
     }
-
 
     export class DifficultyAdjust extends BaseMod {
         declare settings: {
@@ -162,17 +201,26 @@ export namespace Mods {
             approach_rate?: number
             overall_difficulty?: number
         }
-        constructor(mod: ModAcronyms.DifficultyAdjust | BaseMod, settings?: { [key: string]: string | number | boolean }) {
+        constructor(
+            mod: ModAcronyms.DifficultyAdjust | BaseMod,
+            settings?: { [key: string]: string | number | boolean },
+        ) {
             super(mod, settings)
             if (!this.settings) this.settings = {}
         }
 
         public IsDifficulty() {
-            return ((this.settings.circle_size != null) || (this.settings.overall_difficulty != null))
+            return (
+                this.settings.circle_size != null ||
+                this.settings.overall_difficulty != null
+            )
         }
 
         public GetDifficultyVariant() {
-            return new DifficultyAdjust(ModAcronyms.DifficultyAdjust, { circle_size: this.settings.circle_size!, overall_difficulty: this.settings.overall_difficulty! })
+            return new DifficultyAdjust(ModAcronyms.DifficultyAdjust, {
+                circle_size: this.settings.circle_size!,
+                overall_difficulty: this.settings.overall_difficulty!,
+            })
         }
     }
 
@@ -182,7 +230,7 @@ export namespace Mods {
             classic_note_lock: true,
             fade_hit_circle_early: true,
             always_play_tail_sample: true,
-            no_slider_head_accuracy: true
+            no_slider_head_accuracy: true,
         }
         public static flags = {
             classic_health: "classic_health",
@@ -199,14 +247,32 @@ export namespace Mods {
             always_play_tail_sample: boolean
             no_slider_head_accuracy: boolean
         }
-        constructor(mod: string | BaseMod, settings: { [key: string]: string | number | boolean } = {}) {
+        constructor(
+            mod: string | BaseMod,
+            settings: { [key: string]: string | number | boolean } = {},
+        ) {
             super(mod, settings)
             this.settings = {
-                classic_health: Boolean(settings.classic_health ?? Classic.defaultSettings.classic_health),
-                classic_note_lock: Boolean(settings.classic_note_lock ?? Classic.defaultSettings.classic_note_lock),
-                fade_hit_circle_early: Boolean(settings.fade_hit_circle_early ?? Classic.defaultSettings.fade_hit_circle_early),
-                always_play_tail_sample: Boolean(settings.always_play_tail_sample ?? Classic.defaultSettings.always_play_tail_sample),
-                no_slider_head_accuracy: Boolean(settings.no_slider_head_accuracy ?? Classic.defaultSettings.no_slider_head_accuracy)
+                classic_health: Boolean(
+                    settings.classic_health ??
+                        Classic.defaultSettings.classic_health,
+                ),
+                classic_note_lock: Boolean(
+                    settings.classic_note_lock ??
+                        Classic.defaultSettings.classic_note_lock,
+                ),
+                fade_hit_circle_early: Boolean(
+                    settings.fade_hit_circle_early ??
+                        Classic.defaultSettings.fade_hit_circle_early,
+                ),
+                always_play_tail_sample: Boolean(
+                    settings.always_play_tail_sample ??
+                        Classic.defaultSettings.always_play_tail_sample,
+                ),
+                no_slider_head_accuracy: Boolean(
+                    settings.no_slider_head_accuracy ??
+                        Classic.defaultSettings.no_slider_head_accuracy,
+                ),
             }
         }
     }
@@ -215,16 +281,31 @@ export namespace Mods {
         declare public settings: {
             speed_change: number
         }
-        constructor(mod: string | BaseMod, settings?: { [key: string]: string | number | boolean }) {
+        constructor(
+            mod: string | BaseMod,
+            settings?: { [key: string]: string | number | boolean },
+        ) {
             super(mod, settings)
-            if (!this.settings || !this.settings.speed_change) this.settings = { speed_change: DefaultSpeedChange[this.acronym as keyof typeof DefaultSpeedChange] ?? 1 }
+            if (!this.settings || !this.settings.speed_change)
+                this.settings = {
+                    speed_change:
+                        DefaultSpeedChange[
+                            this.acronym as keyof typeof DefaultSpeedChange
+                        ] ?? 1,
+                }
         }
 
         public getMultiplier(): number {
             if (this.settings.speed_change > 1) {
-                return 1 + Math.floor((this.settings.speed_change - 1) / 0.1) * 0.02
+                return (
+                    1 +
+                    Math.floor((this.settings.speed_change - 1) / 0.1) * 0.02
+                )
             } else {
-                return 0.1 + Math.floor((this.settings.speed_change - 0.5) / 0.1) * 0.1
+                return (
+                    0.1 +
+                    Math.floor((this.settings.speed_change - 0.5) / 0.1) * 0.1
+                )
             }
         }
     }
@@ -250,12 +331,15 @@ export namespace Mods {
         }
 
         private CreateMods(mods: string[] | BaseMod[]) {
-            this.mods = mods?.map((mod: string | BaseMod) => {
-                const strMod = typeof mod === "string" ? mod : mod.acronym
-                if (modMap[strMod as keyof typeof modMap]) return new modMap[strMod as keyof typeof modMap](mod as BaseMod)
-                return new BaseMod(mod)
-            }) || []
-
+            this.mods =
+                mods?.map((mod: string | BaseMod) => {
+                    const strMod = typeof mod === "string" ? mod : mod.acronym
+                    if (modMap[strMod as keyof typeof modMap])
+                        return new modMap[strMod as keyof typeof modMap](
+                            mod as BaseMod,
+                        )
+                    return new BaseMod(mod)
+                }) || []
         }
 
         public get Mods() {
@@ -264,26 +348,32 @@ export namespace Mods {
 
         public get Formatted() {
             if (this.mods.length == 0) return "No Mod"
-            const mods = this.mods.map(mod => {
-                if (mod.isSpeedChange() && !mod.isDefaultSpeedChange()) return `${mod.acronym}(${mod.settings.speed_change}x)`
-                return mod.acronym
-            }).join("")
+            const mods = this.mods
+                .map((mod) => {
+                    if (mod.isSpeedChange() && !mod.isDefaultSpeedChange())
+                        return `${mod.acronym}(${mod.settings.speed_change}x)`
+                    return mod.acronym
+                })
+                .join("")
             return mods
         }
 
         public Has(mod: string, flag?: string): boolean {
-            const hasMod = this.mods.find(m => m.acronym == mod)
+            const hasMod = this.mods.find((m) => m.acronym == mod)
 
             if (!flag || !hasMod) return hasMod !== undefined
             return !!hasMod.settings?.[flag as keyof typeof hasMod.settings]
         }
 
         public HasAny(mods: ModAcronyms[]): boolean {
-            return mods.some(mod => this.Has(mod))
+            return mods.some((mod) => this.Has(mod))
         }
 
         public GetSpeedChange(): number {
-            return this.mods.find(mod => mod.isSpeedChange())?.settings?.speed_change as number ?? 1
+            return (
+                (this.mods.find((mod) => mod.isSpeedChange())?.settings
+                    ?.speed_change as number) ?? 1
+            )
         }
 
         public GetData() {
@@ -291,14 +381,27 @@ export namespace Mods {
         }
 
         public GetDifficultyMods() {
-            const mods = this.mods.filter(mod => difficulty_mods.includes(mod.acronym))
-            if (this.Has(ModAcronyms.Flashlight) && this.Has(ModAcronyms.Hidden)) {
-                mods.push(this.mods.find(mod => mod.acronym == ModAcronyms.Hidden)!)
+            const mods = this.mods.filter((mod) =>
+                difficulty_mods.includes(mod.acronym),
+            )
+            if (
+                this.Has(ModAcronyms.Flashlight) &&
+                this.Has(ModAcronyms.Hidden)
+            ) {
+                mods.push(
+                    this.mods.find((mod) => mod.acronym == ModAcronyms.Hidden)!,
+                )
             }
             if (this.Has(ModAcronyms.DifficultyAdjust)) {
-                const mod = this.mods.find(mod => mod.acronym == ModAcronyms.DifficultyAdjust)!
-                const difficultyMod = new Mods.DifficultyAdjust(ModAcronyms.DifficultyAdjust, { circle_size: mod.settings.circle_size })
-                if (difficultyMod.IsDifficulty()) mods.push(difficultyMod.GetDifficultyVariant())
+                const mod = this.mods.find(
+                    (mod) => mod.acronym == ModAcronyms.DifficultyAdjust,
+                )!
+                const difficultyMod = new Mods.DifficultyAdjust(
+                    ModAcronyms.DifficultyAdjust,
+                    { circle_size: mod.settings.circle_size },
+                )
+                if (difficultyMod.IsDifficulty())
+                    mods.push(difficultyMod.GetDifficultyVariant())
             }
             return mods
         }
@@ -307,5 +410,4 @@ export namespace Mods {
             return this.mods.reduce((acc, mod) => acc * mod.getMultiplier(), 1)
         }
     }
-
 }

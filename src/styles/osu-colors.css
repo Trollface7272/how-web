@@ -1,42 +1,42 @@
 :root {
-    --gold: #ffe600;
-    --silver: silver;
-    --bronze: #cd7f32;
-    --iron: #a28c71;
-    --purple: #ed82ff;
-    --blue: #97dcff;
+  --gold: #ffe600;
+  --silver: silver;
+  --bronze: #cd7f32;
+  --iron: #a28c71;
+  --purple: #ed82ff;
+  --blue: #97dcff;
 
-    --lustrous-gradient: linear-gradient(#ffe600, var(--purple));
-    --radiant-gradient: linear-gradient(var(--blue), var(--purple));
+  --lustrous-gradient: linear-gradient(#ffe600, var(--purple));
+  --radiant-gradient: linear-gradient(var(--blue), var(--purple));
 
-    --color-rank-1: var(--lustrous-gradient);
-    --color-top-1: var(--radiant-gradient);
-    --color-top-10: var(--gold);
-    --color-top-50: var(--silver);
-    --color-top-75: var(--bronze);
-    --color-top-100: var(--iron);
+  --color-rank-1: var(--lustrous-gradient);
+  --color-top-1: var(--radiant-gradient);
+  --color-top-10: var(--gold);
+  --color-top-50: var(--silver);
+  --color-top-75: var(--bronze);
+  --color-top-100: var(--iron);
 }
 
 .text-rank-1 {
-    background: var(--color-rank-1);
-    color: transparent;
-    background-clip: text;
+  background: var(--color-rank-1);
+  color: transparent;
+  background-clip: text;
 }
 
 .text-top-1 {
-    background: var(--color-top-1);
-    color: transparent;
-    background-clip: text;
+  background: var(--color-top-1);
+  color: transparent;
+  background-clip: text;
 }
 
 .text-top-10 {
-    background: var(--color-top-10);
-    color: transparent;
-    background-clip: text;
+  background: var(--color-top-10);
+  color: transparent;
+  background-clip: text;
 }
 
 .text-top-50 {
-    background: var(--color-top-50);
-    color: transparent;
-    background-clip: text;
+  background: var(--color-top-50);
+  color: transparent;
+  background-clip: text;
 }

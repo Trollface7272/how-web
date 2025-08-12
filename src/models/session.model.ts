@@ -13,30 +13,31 @@ interface ISession {
 const sessionSchema = new Schema<ISession>({
     userId: {
         type: String,
-        required: true
+        required: true,
     },
     token: {
         type: String,
-        required: true
+        required: true,
     },
     ip: {
         type: String,
-        required: true
+        required: true,
     },
     userAgent: {
         type: String,
-        required: true
+        required: true,
     },
     createdAt: {
         type: Date,
-        default: Date.now
-    }
+        default: Date.now,
+    },
 })
 
-
-
 const sessionModel = (): Model<ISession> => {
-    return mongoose.models?.Session || model<ISession>("Session", sessionSchema, "sessions")
+    return (
+        mongoose.models?.Session ||
+        model<ISession>("Session", sessionSchema, "sessions")
+    )
 }
 
 const sessionCache = new NodeCache({
@@ -55,7 +56,10 @@ export const lookupUser = async (sessionCookie: string) => {
     if (!session) return null
 
     const user = await userModel()
-        .findOne({ id: session.userId }, { _id: 0, id: 1, username: 1, "osu.username": 1, "osu.userId": 1 })
+        .findOne(
+            { id: session.userId },
+            { _id: 0, id: 1, username: 1, "osu.username": 1, "osu.userId": 1 },
+        )
         .exec()
 
     if (!user) return null
@@ -65,8 +69,8 @@ export const lookupUser = async (sessionCookie: string) => {
         username: user.username,
         osu: {
             username: user.osu?.username,
-            userId: user.osu?.userId
-        }
+            userId: user.osu?.userId,
+        },
     })
 
     return user as IClientUser

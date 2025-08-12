@@ -1,9 +1,9 @@
 {
-    "apps": [
-        {
-            "name": "how-web",
-            "script": "pnpm",
-            "args": "run start"
-        }
-    ]
+  "apps": [
+    {
+      "name": "how-web",
+      "script": "pnpm",
+      "args": "run start"
+    }
+  ]
 }

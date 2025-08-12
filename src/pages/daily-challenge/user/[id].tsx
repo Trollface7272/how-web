@@ -6,7 +6,14 @@ import { Container } from "../../../components/GraphContainer"
 import { ICellData, IMatrixData, Matrix } from "../../../components/Matrix"
 import { trpc } from "../../../utils/trpc"
 import { GetUserResponse } from "../../../types/daily-challenge"
-import { Line, LineChart, ResponsiveContainer, YAxis, XAxis, Tooltip } from "recharts"
+import {
+    Line,
+    LineChart,
+    ResponsiveContainer,
+    YAxis,
+    XAxis,
+    Tooltip,
+} from "recharts"
 import { useMemo, useState } from "react"
 import { Loading } from "../../../components/Loading"
 import { Select } from "antd"
@@ -24,7 +31,7 @@ const legendData = [
     { color: "var(--silver)", label: "Top 50%" },
     { color: "var(--bronze", label: "Top 75%" },
     { color: "var(--iron)", label: "Participated" },
-    { color: "#505050", label: "Not participated" }
+    { color: "#505050", label: "Not participated" },
 ]
 
 const placementToColor = (placement: number, placementPercent: number) => {
@@ -36,17 +43,33 @@ const placementToColor = (placement: number, placementPercent: number) => {
     return legendData[5].color
 }
 
-const CellTooltip = ({ placement, placementPercent, score, date }: { placement: number, placementPercent: number, score: number, date: string }) => {
+const CellTooltip = ({
+    placement,
+    placementPercent,
+    score,
+    date,
+}: {
+    placement: number
+    placementPercent: number
+    score: number
+    date: string
+}) => {
     return (
         <div style={{ fontSize: 16 }}>
             <div className="text-center">{date}</div>
-            <div>Placement: #{placement} ({placementPercent.toFixed(2)}%)</div>
+            <div>
+                Placement: #{placement} ({placementPercent.toFixed(2)}%)
+            </div>
             <div>Score: {score.toLocaleString()}</div>
         </div>
     )
 }
 
-const Participation = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
+const Participation = ({
+    scores,
+}: {
+    scores: GetUserResponse["scoreData"]
+}) => {
     const router = useRouter()
     const [filter, setFilter] = useState<null | number>(2025)
     const cellData: Record<string, ICellData> = {}
@@ -54,24 +77,39 @@ const Participation = ({ scores }: { scores: GetUserResponse["scoreData"] }) => 
     const minDate = firstDailyChallengeDate()
     const maxDate = moment().startOf("day")
 
-
     const [from, to] = useMemo(() => {
         if (filter) {
-            return [moment().year(filter).startOf("year").startOf("week"), moment().year(filter).endOf("year").endOf("week")]
+            return [
+                moment().year(filter).startOf("year").startOf("week"),
+                moment().year(filter).endOf("year").endOf("week"),
+            ]
         }
         return [undefined, undefined]
     }, [filter])
 
     scores.forEach((score) => {
-        if (from && from >= moment(score.date) && to && to <= moment(score.date)) return
+        if (
+            from &&
+            from >= moment(score.date) &&
+            to &&
+            to <= moment(score.date)
+        )
+            return
         cellData[moment(score.date).format("YYYY-MM-DD")] = {
             date: new Date(score.date),
             color: placementToColor(score.position, score.positionPercent),
-            Tooltip: <CellTooltip placement={score.position} placementPercent={score.positionPercent} score={score.score} date={moment(score.date).format("DD MMM YYYY")} />
+            Tooltip: (
+                <CellTooltip
+                    placement={score.position}
+                    placementPercent={score.positionPercent}
+                    score={score.score}
+                    date={moment(score.date).format("DD MMM YYYY")}
+                />
+            ),
         }
     })
     const matrixData: IMatrixData = {
-        CellData: cellData
+        CellData: cellData,
     }
 
     const years = useMemo(() => {
@@ -91,14 +129,36 @@ const Participation = ({ scores }: { scores: GetUserResponse["scoreData"] }) => 
 
     return (
         <>
-            <div style={{ marginBottom: 10, display: "flex", justifyContent: "center" }}>
-                <Select style={{ width: 100 }} value={filter} onChange={(value) => setFilter(value as number)}>
+            <div
+                style={{
+                    marginBottom: 10,
+                    display: "flex",
+                    justifyContent: "center",
+                }}
+            >
+                <Select
+                    style={{ width: 100 }}
+                    value={filter}
+                    onChange={(value) => setFilter(value as number)}
+                >
                     <Select.Option value={null}>Last year</Select.Option>
-                    {years.map(el => <Select.Option key={el} value={el}>{el}</Select.Option>)}
-
+                    {years.map((el) => (
+                        <Select.Option key={el} value={el}>
+                            {el}
+                        </Select.Option>
+                    ))}
                 </Select>
             </div>
-            <Matrix onDoubleClick={onDoubleClick} data={matrixData} legendData={legendData} defaultColor={legendData.at(-1)!.color} from={from} to={to} minDate={minDate} maxDate={maxDate} />
+            <Matrix
+                onDoubleClick={onDoubleClick}
+                data={matrixData}
+                legendData={legendData}
+                defaultColor={legendData.at(-1)!.color}
+                from={from}
+                to={to}
+                minDate={minDate}
+                maxDate={maxDate}
+            />
         </>
     )
 }
@@ -106,10 +166,10 @@ const Participation = ({ scores }: { scores: GetUserResponse["scoreData"] }) => 
 const Score = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
     const router = useRouter()
     const data = useMemo(() => {
-        return scores.map(score => {
+        return scores.map((score) => {
             return {
                 score: score.score,
-                date: moment(score.date).format("DD MMM YYYY")
+                date: moment(score.date).format("DD MMM YYYY"),
             }
         })
     }, [scores])
@@ -121,11 +181,24 @@ const Score = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
 
     return (
         <ResponsiveContainer width={"100%"} height={400}>
-            <LineChart data={data} onDoubleClick={(e) => onDoubleClick(e.activeIndex)}>
-                <Line type="linear" yAxisId={"left"} dot={false} name="Score" dataKey="score" stroke="#8884d8" />
+            <LineChart
+                data={data}
+                onDoubleClick={(e) => onDoubleClick(e.activeIndex)}
+            >
+                <Line
+                    type="linear"
+                    yAxisId={"left"}
+                    dot={false}
+                    name="Score"
+                    dataKey="score"
+                    stroke="#8884d8"
+                />
                 <XAxis dataKey="date" />
                 <YAxis dataKey="score" />
-                <Tooltip contentStyle={{ backgroundColor: "black" }} formatter={(num) => num.toLocaleString()} />
+                <Tooltip
+                    contentStyle={{ backgroundColor: "black" }}
+                    formatter={(num) => num.toLocaleString()}
+                />
             </LineChart>
         </ResponsiveContainer>
     )
@@ -134,11 +207,11 @@ const Score = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
 const Placement = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
     const router = useRouter()
     const data = useMemo(() => {
-        return scores.map(score => {
+        return scores.map((score) => {
             return {
                 placement: score.position,
                 placementText: `#${score.position} (${score.positionPercent.toFixed(2)}%)`,
-                date: moment(score.date).format("DD MMM YYYY")
+                date: moment(score.date).format("DD MMM YYYY"),
             }
         })
     }, [scores])
@@ -150,11 +223,23 @@ const Placement = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
 
     return (
         <ResponsiveContainer width={"100%"} height={400}>
-            <LineChart data={data} onDoubleClick={(e) => onDoubleClick(e.activeIndex)}>
-                <Line type="linear" dot={false} name="Placement" dataKey="placement" stroke="#82ca9d" />
+            <LineChart
+                data={data}
+                onDoubleClick={(e) => onDoubleClick(e.activeIndex)}
+            >
+                <Line
+                    type="linear"
+                    dot={false}
+                    name="Placement"
+                    dataKey="placement"
+                    stroke="#82ca9d"
+                />
                 <XAxis dataKey="date" />
                 <YAxis dataKey="placement" />
-                <Tooltip contentStyle={{ backgroundColor: "black" }} formatter={(num, name, item) => item.payload.placementText} />
+                <Tooltip
+                    contentStyle={{ backgroundColor: "black" }}
+                    formatter={(num, name, item) => item.payload.placementText}
+                />
             </LineChart>
         </ResponsiveContainer>
     )
@@ -162,13 +247,19 @@ const Placement = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
 
 const User = () => {
     const { id } = useRouter().query
-    const { data, isLoading, isError } = trpc.dailyChallenge.getUser.useQuery({ id: id as string }, {
-        enabled: !!id
-    })
+    const { data, isLoading, isError } = trpc.dailyChallenge.getUser.useQuery(
+        { id: id as string },
+        {
+            enabled: !!id,
+        },
+    )
 
     const avgScore = useMemo(() => {
         if (!data) return 0
-        return Math.round(data.scoreData.reduce((acc, score) => acc + score.score, 0) / data.scoreData.length)
+        return Math.round(
+            data.scoreData.reduce((acc, score) => acc + score.score, 0) /
+                data.scoreData.length,
+        )
     }, [data])
 
     if (isLoading) return <Loading fullPage />
@@ -178,18 +269,36 @@ const User = () => {
     return (
         <>
             <Container title="">
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "center" }}>
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        justifyContent: "center",
+                    }}
+                >
                     <div>
-                        <Image alt="avatar" src={`https://a.ppy.sh/${data.id}`} width={75} height={75} style={{ borderRadius: "50%" }} />
+                        <Image
+                            alt="avatar"
+                            src={`https://a.ppy.sh/${data.id}`}
+                            width={75}
+                            height={75}
+                            style={{ borderRadius: "50%" }}
+                        />
                     </div>
-                    <div style={{ fontSize: "24px", fontWeight: "bold" }}>{data.username}</div>
+                    <div style={{ fontSize: "24px", fontWeight: "bold" }}>
+                        {data.username}
+                    </div>
                 </div>
             </Container>
             <Container title="Participation">
                 <Participation scores={data.scoreData} />
             </Container>
             <Container title="Placement">
-                <div>Average Placement: {data.averagePlacement.toFixed(0)} ({data.averagePlacementPercent.toFixed(2)}%)</div>
+                <div>
+                    Average Placement: {data.averagePlacement.toFixed(0)} (
+                    {data.averagePlacementPercent.toFixed(2)}%)
+                </div>
                 <Placement scores={data.scoreData} />
             </Container>
             <Container title="Score">

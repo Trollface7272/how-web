@@ -1,10 +1,12 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import userModel from "../../../models/user.model";
-import { randomBytes } from "crypto";
-import sessionModel from "../../../models/session.model";
+import { NextApiRequest, NextApiResponse } from "next"
+import userModel from "../../../models/user.model"
+import { randomBytes } from "crypto"
+import sessionModel from "../../../models/session.model"
 
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse,
+) {
     const { code, state } = req.query
     if (!code) return res.status(400).json({ error: "No code provided" })
     const response = await fetch(`https://osu.ppy.sh/oauth/token`, {
@@ -14,24 +16,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             client_secret: process.env.OSU_CLIENT_SECRET,
             code: code,
             grant_type: "authorization_code",
-            redirect_uri: process.env.OSU_RETURN_URL
+            redirect_uri: process.env.OSU_RETURN_URL,
         }),
         headers: {
-            "Content-Type": "application/json"
-        }
+            "Content-Type": "application/json",
+        },
     })
     const data: {
-        token_type: "Bearer",
-        access_token: string,
-        expires_in: number,
-        refresh_token: string,
+        token_type: "Bearer"
+        access_token: string
+        expires_in: number
+        refresh_token: string
         scope: string
     } = await response.json()
 
     const osuUserRequest = await fetch(`https://osu.ppy.sh/api/v2/me`, {
         headers: {
-            "Authorization": `Bearer ${data.access_token}`
-        }
+            Authorization: `Bearer ${data.access_token}`,
+        },
     })
 
     const osuUser = await osuUserRequest.json()
@@ -51,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         country: osuUser.country_code,
         countryRank: osuUser.statistics.country_rank,
         pp: osuUser.statistics.pp,
-        rank: osuUser.statistics.global_rank
+        rank: osuUser.statistics.global_rank,
     }
 
     if (process.env.NODE_ENV === "production") {
@@ -59,17 +61,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const session_token = randomBytes(32).toString("hex")
-    const ip = (req.headers["x-forwarded-for"] as string | undefined) ?? req.socket.remoteAddress
-    const session = await sessionModel()
-        .create({
-            userId: user.id,
-            token: session_token,
-            ip: ip,
-            userAgent: req.headers["user-agent"] as string
-        })
+    const ip =
+        (req.headers["x-forwarded-for"] as string | undefined) ??
+        req.socket.remoteAddress
+    const session = await sessionModel().create({
+        userId: user.id,
+        token: session_token,
+        ip: ip,
+        userAgent: req.headers["user-agent"] as string,
+    })
 
-    res
-        .setHeader("Set-Cookie", `session=${session_token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800`)
+    res.setHeader(
+        "Set-Cookie",
+        `session=${session_token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800`,
+    )
         .status(200)
         .redirect("/")
 }

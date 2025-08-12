@@ -1,3 +1,5 @@
+import { DeepPick } from "ts-deep-pick"
+import { UserPlacements } from "./daily-challenge-profile"
 import { IDailyChallengeScore } from "./daily-challenge-score"
 
 export interface GetDailyChallengeResponse {
@@ -16,26 +18,37 @@ export interface GetCurrentChallengeResponse {
     currentUserScore: GetCurrentChallengeUserScore
 }
 
-export type GetCurrentChallengeUserScore = Pick<IDailyChallengeScore, "id" | "total_score" | "position">
+export type GetCurrentChallengeUserScore = Pick<
+    IDailyChallengeScore,
+    "id" | "total_score" | "position"
+>
 
 export interface GetLeaderboardsResponse {
-    username: string,
-    id: string,
+    username: string
+    id: string
     country: string
     played: {
         count: number
     }
-    top10Percent: {
-        count: number
-    }
-    top50Percent: {
-        count: number
+    placements: DeepPick<
+        UserPlacements,
+        | "rank1.count"
+        | "top1.count"
+        | "top5.count"
+        | "top10.count"
+        | "top25.count"
+        | "top50.count"
+        | "top75.count"
+        | "top100.count"
+    >
+    statistics: {
+        total_score: number
     }
 }
 
 export interface GetUserResponse {
-    username: string,
-    id: string,
+    username: string
+    id: string
     country: string
     played: {
         count: number
@@ -60,13 +73,15 @@ export interface GetUserResponse {
     averagePlacementPercent: number
 }
 
-
 export interface DailyChallengeData {
     total: number
     starts_at: string
     ends_at: string
     thresholds: Thresholds
-    current_playlist_item: Pick<CurrentPlaylistItem, "required_mods" | "room_id">
+    current_playlist_item: Pick<
+        CurrentPlaylistItem,
+        "required_mods" | "room_id"
+    >
     modData: ModData
 }
 

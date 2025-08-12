@@ -1,6 +1,5 @@
-import mongoose, { model, Model, Schema } from "mongoose";
-import { IDailyChallengeScore } from "../types/daily-challenge-score";
-
+import mongoose, { model, Model, Schema } from "mongoose"
+import { IDailyChallengeScore } from "../types/daily-challenge-score"
 
 const scoreSchema = new Schema<IDailyChallengeScore>({
     id: {
@@ -126,7 +125,14 @@ const scoreSchema = new Schema<IDailyChallengeScore>({
 })
 
 const dailyChallengeScoreModel = (): Model<IDailyChallengeScore> => {
-    return mongoose.models?.DailyChallengeScore || model<IDailyChallengeScore>("DailyChallengeScore", scoreSchema, "dailychallengescore")
+    return (
+        mongoose.models?.DailyChallengeScore ||
+        model<IDailyChallengeScore>(
+            "DailyChallengeScore",
+            scoreSchema,
+            "dailychallengescore",
+        )
+    )
 }
 
-export default dailyChallengeScoreModel;
+export default dailyChallengeScoreModel
