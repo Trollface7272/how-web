@@ -16,7 +16,8 @@ import {
 } from "recharts"
 import { useMemo, useState } from "react"
 import { Loading } from "../../../components/Loading"
-import { Select } from "antd"
+import { ScoresTable } from "../../../components/ScoresTable"
+import { Select, Tabs } from "antd"
 import { extendMoment } from "moment-range"
 import { firstDailyChallengeDate } from "../../../utils/osu/osu"
 import { TooltipIndex } from "recharts/types/state/tooltipSlice"
@@ -71,7 +72,7 @@ const Participation = ({
     scores: GetUserResponse["scoreData"]
 }) => {
     const router = useRouter()
-    const [filter, setFilter] = useState<null | number>(2025)
+    const [filter, setFilter] = useState<null | number>(moment().year())
     const cellData: Record<string, ICellData> = {}
 
     const minDate = firstDailyChallengeDate()
@@ -245,6 +246,46 @@ const Placement = ({ scores }: { scores: GetUserResponse["scoreData"] }) => {
     )
 }
 
+const RankHistoryChart = ({
+    history,
+}: {
+    history: GetUserResponse["rankHistory"]
+}) => {
+    const data = useMemo(() => {
+        return [...history]
+            .sort((a, b) => moment(a.date).valueOf() - moment(b.date).valueOf())
+            .map(entry => ({
+                rank: entry.rank,
+                rankText: `#${entry.rank.toLocaleString()}`,
+                date: moment(entry.date).format("DD MMM YYYY"),
+            }))
+    }, [history])
+
+    if (!data.length) {
+        return <div>No rank history</div>
+    }
+
+    return (
+        <ResponsiveContainer width={"100%"} height={400}>
+            <LineChart data={data}>
+                <Line
+                    type="linear"
+                    dot={false}
+                    name="PP Rank"
+                    dataKey="rank"
+                    stroke="#ed82ff"
+                />
+                <XAxis dataKey="date" />
+                <YAxis dataKey="rank" reversed allowDecimals={false} />
+                <Tooltip
+                    contentStyle={{ backgroundColor: "black" }}
+                    formatter={(_num, _name, item) => item.payload.rankText}
+                />
+            </LineChart>
+        </ResponsiveContainer>
+    )
+}
+
 const User = () => {
     const { id } = useRouter().query
     const { data, isLoading, isError } = trpc.dailyChallenge.getUser.useQuery(
@@ -272,38 +313,192 @@ const User = () => {
                 <div
                     style={{
                         display: "flex",
+                        flexDirection: "column",
                         alignItems: "center",
-                        gap: "10px",
-                        justifyContent: "center",
+                        gap: 16,
                     }}
                 >
-                    <div>
-                        <Image
-                            alt="avatar"
-                            src={`https://a.ppy.sh/${data.id}`}
-                            width={75}
-                            height={75}
-                            style={{ borderRadius: "50%" }}
-                        />
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <div>
+                            <Image
+                                alt="avatar"
+                                src={`https://a.ppy.sh/${data.id}`}
+                                width={75}
+                                height={75}
+                                style={{ borderRadius: "50%" }}
+                            />
+                        </div>
+                        <div style={{ fontSize: "24px", fontWeight: "bold" }}>
+                            {data.username}
+                        </div>
                     </div>
-                    <div style={{ fontSize: "24px", fontWeight: "bold" }}>
-                        {data.username}
+                    <div
+                        style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: 24,
+                            justifyContent: "center",
+                            fontSize: 16,
+                        }}
+                    >
+                        <div>
+                            <div style={{ opacity: 0.65, fontSize: 13 }}>
+                                Total Score
+                            </div>
+                            <div style={{ fontWeight: 600 }}>
+                                {data.statistics.totalScore?.toLocaleString() ??
+                                    "-"}
+                            </div>
+                        </div>
+                        <div>
+                            <div style={{ opacity: 0.65, fontSize: 13 }}>
+                                Accuracy
+                            </div>
+                            <div style={{ fontWeight: 600 }}>
+                                {data.statistics.accuracy != null
+                                    ? `${(data.statistics.accuracy * 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
+                                    : "-"}
+                            </div>
+                        </div>
+                        <div>
+                            <div style={{ opacity: 0.65, fontSize: 13 }}>
+                                PP Rank
+                            </div>
+                            <div style={{ fontWeight: 600 }}>
+                                {data.ppRank != null
+                                    ? `#${data.ppRank.toLocaleString()}`
+                                    : "-"}
+                            </div>
+                        </div>
+                        <div>
+                            <div style={{ opacity: 0.65, fontSize: 13 }}>
+                                PP
+                            </div>
+                            <div style={{ fontWeight: 600 }}>
+                                {data.statistics.pp != null
+                                    ? Number(
+                                          data.statistics.pp.toFixed(0),
+                                      ).toLocaleString()
+                                    : "-"}
+                            </div>
+                        </div>
+                        <div>
+                            <div style={{ opacity: 0.65, fontSize: 13 }}>
+                                Total PP
+                            </div>
+                            <div style={{ fontWeight: 600 }}>
+                                {data.statistics.totalPP != null
+                                    ? Number(
+                                          data.statistics.totalPP.toFixed(0),
+                                      ).toLocaleString()
+                                    : "-"}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </Container>
-            <Container title="Participation">
-                <Participation scores={data.scoreData} />
-            </Container>
-            <Container title="Placement">
-                <div>
-                    Average Placement: {data.averagePlacement.toFixed(0)} (
-                    {data.averagePlacementPercent.toFixed(2)}%)
-                </div>
-                <Placement scores={data.scoreData} />
-            </Container>
-            <Container title="Score">
-                <div>Average Score: {avgScore.toLocaleString()}</div>
-                <Score scores={data.scoreData} />
+            <Container title="">
+                <Tabs
+                    defaultActiveKey="participation"
+                    items={[
+                        {
+                            key: "participation",
+                            label: "Participation",
+                            children: (
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        gap: 24,
+                                    }}
+                                >
+                                    <section>
+                                        <div
+                                            style={{
+                                                fontSize: 28,
+                                                fontWeight: "bold",
+                                                marginBottom: 16,
+                                            }}
+                                        >
+                                            Participation
+                                        </div>
+                                        <Participation
+                                            scores={data.scoreData}
+                                        />
+                                    </section>
+                                    <section>
+                                        <div
+                                            style={{
+                                                fontSize: 28,
+                                                fontWeight: "bold",
+                                                marginBottom: 16,
+                                            }}
+                                        >
+                                            Placement
+                                        </div>
+                                        <div>
+                                            Average Placement:{" "}
+                                            {data.averagePlacement.toFixed(0)} (
+                                            {data.averagePlacementPercent.toFixed(
+                                                2,
+                                            )}
+                                            %)
+                                        </div>
+                                        <Placement scores={data.scoreData} />
+                                    </section>
+                                    <section>
+                                        <div
+                                            style={{
+                                                fontSize: 28,
+                                                fontWeight: "bold",
+                                                marginBottom: 16,
+                                            }}
+                                        >
+                                            Score
+                                        </div>
+                                        <div>
+                                            Average Score:{" "}
+                                            {avgScore.toLocaleString()}
+                                        </div>
+                                        <Score scores={data.scoreData} />
+                                    </section>
+                                </div>
+                            ),
+                        },
+                        {
+                            key: "ranking",
+                            label: "Ranking",
+                            children: (
+                                <section>
+                                    <div
+                                        style={{
+                                            fontSize: 28,
+                                            fontWeight: "bold",
+                                            marginBottom: 16,
+                                        }}
+                                    >
+                                        Rank History
+                                    </div>
+                                    <RankHistoryChart
+                                        history={data.rankHistory}
+                                    />
+                                </section>
+                            ),
+                        },
+                        {
+                            key: "scores",
+                            label: "Scores",
+                            children: <ScoresTable userId={Number(data.id)} />,
+                        },
+                    ]}
+                />
             </Container>
         </>
     )

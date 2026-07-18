@@ -2,6 +2,7 @@
 @import "./matrix.css";
 @import "./osu-colors.css";
 @import "./mods.css";
+@import "./grades.css";
 
 :root {
   --max-width: 1100px;
@@ -122,6 +123,73 @@ a {
 
 .table-row-cursor-pointer td {
   cursor: pointer;
+}
+
+.scores-table .ant-table-thead > tr > th {
+  white-space: nowrap;
+}
+
+.page-loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1100;
+  height: 3px;
+  width: 0;
+  background: linear-gradient(90deg, #ffe600, #97dcff);
+  box-shadow: 0 0 8px rgba(151, 220, 255, 0.45);
+  opacity: 1;
+  pointer-events: none;
+  transition:
+    width 8s cubic-bezier(0.1, 0.05, 0, 1),
+    opacity 0.25s ease;
+}
+
+.page-loading-bar--active {
+  width: 80%;
+}
+
+.page-loading-bar--done {
+  width: 100%;
+  opacity: 0;
+  transition:
+    width 0.2s ease,
+    opacity 0.25s ease 0.05s;
+}
+
+.page-fade {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease;
+}
+
+.page-fade--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 120px;
+  animation: page-loading-in 0.25s ease both;
+}
+
+.page-loading--full {
+  height: 100vh;
+}
+
+@keyframes page-loading-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .group-title-text-hidden {

@@ -9,16 +9,68 @@ import { useRouter } from "next/router"
 import { debounce } from "../../utils/helpers"
 import { SearchSelectUserRow } from "../../components/SearchSelectUserRow"
 import { Loading } from "../../components/Loading"
+import { Row } from "../../components/Row"
 
 const PER_PAGE = 10
 
+const SORT_OPTIONS = [
+    {
+        title: "Played",
+        value: "top100",
+        label: "Played",
+    },
+    {
+        title: "Total Score",
+        value: "total_score",
+        label: "Total Score",
+    },
+    {
+        title: "PP",
+        value: "pp",
+        label: "PP",
+    },
+    {
+        title: "Rank 1",
+        value: "rank1",
+        label: "Rank 1",
+    },
+    {
+        title: "Top 1%",
+        value: "top1",
+        label: "Top 1%",
+    },
+    {
+        title: "Top 10%",
+        value: "top10",
+        label: "Top 10%",
+    },
+    {
+        title: "Top 50%",
+        value: "top50",
+        label: "Top 50%",
+    },
+]
+
+type SortOption =
+    | "total_score"
+    | "pp"
+    | "rank1"
+    | "top1"
+    | "top10"
+    | "top50"
+    | "top5"
+    | "top25"
+    | "top75"
+    | "top100"
+
 const Leaderboards = () => {
+    const [sort, setSort] = useState<SortOption[]>(["top100", "total_score"])
     const [search, setSearch] = useState("")
     const [page, setPage] = useState(0)
 
     const { data, isLoading, isError, isFetching } =
         trpc.dailyChallenge.getLeaderboards.useQuery(
-            { limit: PER_PAGE, cursor: page * PER_PAGE },
+            { limit: PER_PAGE, cursor: page * PER_PAGE, sort: sort },
             {
                 placeholderData: prev => prev,
             },
@@ -37,7 +89,7 @@ const Leaderboards = () => {
 
     const rowData = useMemo(() => {
         if (!data) return []
-        return (
+        const response =
             data.data.map((item, index) => ({
                 key: item.id,
                 id: item.id,
@@ -45,6 +97,7 @@ const Leaderboards = () => {
                 username: item.username,
                 country: item.country,
                 played: item.placements.top100.count,
+                pp: item.statistics?.pp,
                 rank1: item.placements.rank1.count,
                 top1: item.placements.top1.count,
                 top5: item.placements.top5.count,
@@ -53,7 +106,7 @@ const Leaderboards = () => {
                 top50: item.placements.top50.count,
                 top75: item.placements.top75.count,
             })) || []
-        )
+        return response
     }, [data, page])
 
     if (isLoading) return <Loading fullPage />
@@ -73,43 +126,70 @@ const Leaderboards = () => {
         total: data.total,
     }
 
+    const onSortChange = (value: SortOption[]) => {
+        setSort(value)
+    }
+
     return (
         <Container title="Leaderboards">
-            <div>
-                <Select
-                    labelInValue
-                    showSearch={true}
-                    filterOption={false}
-                    onSearch={onSearch}
-                    notFoundContent={
-                        !search ? (
-                            <></>
-                        ) : isSearchLoading ? (
-                            <Spin />
-                        ) : (
-                            <div>No results</div>
-                        )
-                    }
-                    style={{ width: 200 }}
-                    options={searchData?.map(item => ({
-                        label: item.username,
-                        value: item.id,
-                    }))}
-                    optionRender={item => (
-                        <SearchSelectUserRow
-                            username={item.label!.toString()}
-                            id={item.value!.toString()}
-                            link={`/daily-challenge/user/${item.value}`}
-                        />
-                    )}
-                />
-            </div>
+            <Row className="flex-col">
+                <div>
+                    <Select
+                        labelInValue
+                        showSearch={true}
+                        filterOption={false}
+                        onSearch={onSearch}
+                        placeholder="Search"
+                        notFoundContent={
+                            !search ? (
+                                <></>
+                            ) : isSearchLoading ? (
+                                <Spin />
+                            ) : (
+                                <div>No results</div>
+                            )
+                        }
+                        style={{ width: 200 }}
+                        options={searchData?.map(item => ({
+                            label: item.username,
+                            value: item.id,
+                        }))}
+                        optionRender={item => (
+                            <SearchSelectUserRow
+                                username={item.label!.toString()}
+                                id={item.value!.toString()}
+                                link={`/daily-challenge/user/${item.value}`}
+                            />
+                        )}
+                    />
+                </div>
+                <div style={{ alignSelf: "flex-start" }}>
+                    <Select
+                        mode="multiple"
+                        style={{ width: 500 }}
+                        onChange={onSortChange}
+                        options={SORT_OPTIONS.filter(
+                            el => !sort.includes(el.value as SortOption),
+                        )}
+                        value={sort}
+                    />
+                </div>
+            </Row>
             <Table
                 pagination={pagination}
                 style={{ width: "100%" }}
                 dataSource={rowData}
                 onRow={onRow}
                 className="table-row-cursor-pointer"
+                summary={() => (
+                    <Table.Summary fixed="top">
+                        <Table.Summary.Row>
+                            <Table.Summary.Cell index={0}>
+                                {data.self?.position}
+                            </Table.Summary.Cell>
+                        </Table.Summary.Row>
+                    </Table.Summary>
+                )}
             >
                 <Table.Column
                     title="Rank"
@@ -162,6 +242,17 @@ const Leaderboards = () => {
                     dataIndex="played"
                     width={100}
                     key="played"
+                />
+                <Table.Column
+                    title="PP"
+                    dataIndex="pp"
+                    width={100}
+                    key="pp"
+                    render={pp =>
+                        pp != null
+                            ? Number(pp.toFixed(0)).toLocaleString()
+                            : "-"
+                    }
                 />
                 <Table.Column
                     title="Rank 1"

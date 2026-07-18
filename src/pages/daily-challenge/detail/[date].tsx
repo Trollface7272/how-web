@@ -4,7 +4,7 @@ import dayjs from "dayjs"
 import moment from "moment"
 import Image from "next/image"
 import { useRouter } from "next/router"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import {
     Legend,
     Line,
@@ -244,15 +244,20 @@ const ParticipationGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
 
 const ThresholdsGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
     const [hidden, setHidden] = useState<string[]>(["top1", "top25", "top75"])
-    const data = thresholds.map(threshold => ({
-        date: moment(threshold.date).format("HH:mm"),
-        rank1: threshold?.rank1?.score,
-        top1: threshold?.top1?.score,
-        top10: threshold?.top10?.score,
-        top25: threshold?.top25?.score,
-        top50: threshold?.top50?.score,
-        top75: threshold?.top75?.score,
-    }))
+    const data = useMemo(() => {
+        const ret = thresholds.map(threshold => ({
+            date: moment(threshold.date).format("HH:mm"),
+            rank1: threshold?.rank1?.score,
+            rank1_fake: threshold?.rank1?.score,
+            top1: threshold?.top1?.score,
+            top10: threshold?.top10?.score,
+            top25: threshold?.top25?.score,
+            top50: threshold?.top50?.score,
+            top75: threshold?.top75?.score,
+        }))
+        ret[0].rank1_fake += 10
+        return ret
+    }, [thresholds])
 
     const handleLegendClick = (dataKey: string) => {
         if (hidden.includes(dataKey)) {
@@ -265,14 +270,49 @@ const ThresholdsGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
     return (
         <ResponsiveContainer width="100%" height={300}>
             <LineChart data={data}>
+                <defs>
+                    <linearGradient
+                        id="lustrous-gradient"
+                        x1="0%"
+                        y1="0"
+                        x2="100%"
+                        y2="0"
+                        spreadMethod="pad"
+                    >
+                        <stop
+                            offset="0%"
+                            stopColor="var(--lustrous-gradient-start)"
+                        />
+                        <stop
+                            offset="100%"
+                            stopColor="var(--lustrous-gradient-end)"
+                        />
+                    </linearGradient>
+                    <linearGradient
+                        id="radiant-gradient"
+                        x1="0%"
+                        y1="0"
+                        x2="100%"
+                        y2="0"
+                    >
+                        <stop
+                            offset="0%"
+                            stopColor="var(--radiant-gradient-start)"
+                        />
+                        <stop
+                            offset="100%"
+                            stopColor="var(--radiant-gradient-end)"
+                        />
+                    </linearGradient>
+                </defs>
                 <Line
-                    type={"linear"}
-                    hide={hidden.includes("rank1")}
-                    dataKey="rank1"
+                    type={"monotone"}
+                    hide={hidden.includes("rank1_fake")}
+                    dataKey="rank1_fake"
                     dot={false}
                     name={"Rank 1"}
-                    stroke="var(--gold)"
-                    strokeWidth={1.2}
+                    stroke="url(#lustrous-gradient)"
+                    strokeWidth={1.5}
                 />
                 <Line
                     type={"linear"}
@@ -280,8 +320,8 @@ const ThresholdsGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
                     dataKey="top1"
                     dot={false}
                     name={"Top 1%"}
-                    stroke="var(--purple)"
-                    strokeWidth={1.2}
+                    stroke="url(#radiant-gradient"
+                    strokeWidth={1.5}
                 />
                 <Line
                     type={"linear"}
@@ -289,26 +329,26 @@ const ThresholdsGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
                     dataKey="top10"
                     dot={false}
                     name={"Top 10%"}
-                    stroke="var(--silver)"
-                    strokeWidth={1.2}
+                    stroke="var(--color-top-10)"
+                    strokeWidth={1.5}
                 />
-                <Line
+                {/* <Line
                     type={"linear"}
                     hide={hidden.includes("top25")}
                     dataKey="top25"
                     dot={false}
                     name={"Top 25%"}
-                    stroke="var(--blue)"
-                    strokeWidth={1.2}
-                />
+                    stroke="var(--color-top-25)"
+                    strokeWidth={1.5}
+                /> */}
                 <Line
                     type={"linear"}
                     hide={hidden.includes("top50")}
                     dataKey="top50"
                     dot={false}
                     name={"Top 50%"}
-                    stroke="var(--bronze)"
-                    strokeWidth={1.2}
+                    stroke="var(--color-top-50)"
+                    strokeWidth={1.5}
                 />
                 <Line
                     type={"linear"}
@@ -316,14 +356,19 @@ const ThresholdsGraph = ({ thresholds }: { thresholds: Thresholds[] }) => {
                     dataKey="top75"
                     dot={false}
                     name={"Top 75%"}
-                    stroke="var(--iron)"
-                    strokeWidth={1.2}
+                    stroke="var(--color-top-75)"
+                    strokeWidth={1.5}
                 />
                 <XAxis dataKey="date" />
                 <YAxis domain={["auto", "auto"]} />
                 <Tooltip
                     contentStyle={{ backgroundColor: "black" }}
-                    formatter={num => num.toLocaleString()}
+                    formatter={(num, name, item) => {
+                        if (name === "Rank 1") {
+                            return item.payload.rank1.toLocaleString()
+                        }
+                        return num.toLocaleString()
+                    }}
                 />
                 <Legend
                     onClick={props =>
@@ -353,7 +398,6 @@ const DailyChallengeDetail = () => {
         currentUserScore,
     } = data
 
-    console.log(data)
     return (
         <div>
             <Container title="Current Challenge">

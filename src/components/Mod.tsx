@@ -1,161 +1,150 @@
 import { Tooltip } from "antd"
 import { Mod as IMod } from "../types/daily-challenge-profile"
-import { modAcronyms } from "../utils/osu/osu"
+import { modNames, ModNameEntry } from "../utils/osu/mod-names"
 
-const modConfig = {
-    NM: {
-        type: "System",
-    },
+const numberFormatter = new Intl.NumberFormat("en")
 
-    DC: {
-        type: "DifficultyReduction",
-    },
-    HT: {
-        type: "DifficultyReduction",
-    },
-    NF: {
-        type: "DifficultyReduction",
-    },
-
-    AC: {
-        type: "DifficultyIncrease",
-    },
-    BL: {
-        type: "DifficultyIncrease",
-    },
-    DT: {
-        type: "DifficultyIncrease",
-    },
-    HD: {
-        type: "DifficultyIncrease",
-    },
-    FL: {
-        type: "DifficultyIncrease",
-    },
-    HR: {
-        type: "DifficultyIncrease",
-    },
-    NC: {
-        type: "DifficultyIncrease",
-    },
-    PF: {
-        type: "DifficultyIncrease",
-    },
-    SD: {
-        type: "DifficultyIncrease",
-    },
-    ST: {
-        type: "DifficultyIncrease",
-    },
-
-    AL: {
-        type: "Conversion",
-    },
-    CL: {
-        type: "Conversion",
-    },
-    DA: {
-        type: "Conversion",
-    },
-    MR: {
-        type: "Conversion",
-    },
-    RD: {
-        type: "Conversion",
-    },
-    SG: {
-        type: "Conversion",
-    },
-    TP: {
-        type: "Conversion",
-    },
-
-    AP: {
-        type: "Automation",
-    },
-    RX: {
-        type: "Automation",
-    },
-    SO: {
-        type: "Automation",
-    },
-
-    AD: {
-        type: "Fun",
-    },
-    AS: {
-        type: "Fun",
-    },
-    BM: {
-        type: "Fun",
-    },
-    BR: {
-        type: "Fun",
-    },
-    BU: {
-        type: "Fun",
-    },
-    DF: {
-        type: "Fun",
-    },
-    DP: {
-        type: "Fun",
-    },
-    FR: {
-        type: "Fun",
-    },
-    GR: {
-        type: "Fun",
-    },
-    MG: {
-        type: "Fun",
-    },
-    MU: {
-        type: "Fun",
-    },
-    NS: {
-        type: "Fun",
-    },
-    RP: {
-        type: "Fun",
-    },
-    SI: {
-        type: "Fun",
-    },
-    SY: {
-        type: "Fun",
-    },
-    TC: {
-        type: "Fun",
-    },
-    TF: {
-        type: "Fun",
-    },
-    WD: {
-        type: "Fun",
-    },
-    WG: {
-        type: "Fun",
-    },
-    WU: {
-        type: "Fun",
-    },
-
-    TD: {
-        type: "System",
-    },
+function format(value: unknown) {
+    if (typeof value === "boolean") {
+        return value ? "on" : "off"
+    }
+    if (typeof value === "number") {
+        return numberFormatter.format(value)
+    }
+    return String(value)
 }
 
-export const Mod = ({ mod }: { mod: IMod }) => {
-    const conf = modConfig[mod.acronym as keyof typeof modConfig]
-    if (!conf) return <></>
+function formatNumberWithPrecision(value: number, precision: number) {
+    return value.toLocaleString("en", {
+        maximumFractionDigits: precision,
+        minimumFractionDigits: precision,
+    })
+}
+
+function modDetails(mod: IMod): ModNameEntry {
     return (
-        <Tooltip title={modAcronyms[mod.acronym as keyof typeof modAcronyms]}>
-            <div className={`mod mod--type-${conf.type}`}>
+        modNames[mod.acronym] ?? {
+            acronym: mod.acronym,
+            name: mod.acronym,
+            type: "Fun",
+            setting_labels: {},
+            icon: "",
+        }
+    )
+}
+
+function settingsLabel(modJson: ModNameEntry, mod: IMod) {
+    const settings: string[] = []
+    for (const [setting, value] of Object.entries(mod.settings ?? {})) {
+        if (setting === "speed_change") {
+            settings.push(`${format(value)}×`)
+        } else {
+            const label = modJson.setting_labels[setting]
+            if (label != null) {
+                settings.push(`${label}: ${format(value)}`)
+            }
+        }
+    }
+    return settings
+}
+
+type ExtendedContentDisplayCandidate = {
+    acronym: string
+    significantDigits: number
+}
+
+export function getExtendedContent(mod: IMod): string {
+    switch (mod.acronym) {
+        case "HT":
+        case "DC":
+        case "DT":
+        case "NC": {
+            const speedChange = mod.settings?.speed_change as number | undefined
+            return speedChange != null
+                ? `${formatNumberWithPrecision(speedChange, 2)}×`
+                : ""
+        }
+        case "DA": {
+            const displayCandidates: Record<
+                string,
+                ExtendedContentDisplayCandidate
+            > = {
+                approach_rate: { acronym: "AR", significantDigits: 1 },
+                circle_size: { acronym: "CS", significantDigits: 1 },
+                drain_rate: { acronym: "HP", significantDigits: 1 },
+                overall_difficulty: { acronym: "OD", significantDigits: 1 },
+                scroll_speed: { acronym: "SS", significantDigits: 2 },
+            }
+
+            let displayCandidate: ExtendedContentDisplayCandidate | undefined
+            let displayValue: number | undefined
+
+            for (const [key, setting] of Object.entries(displayCandidates)) {
+                const settingValue = mod.settings?.[key]
+                if (typeof settingValue === "number") {
+                    if (displayCandidate !== undefined) {
+                        return ""
+                    }
+                    displayValue = settingValue
+                    displayCandidate = setting
+                }
+            }
+
+            if (displayCandidate != null && displayValue != null) {
+                return `${displayCandidate.acronym}${formatNumberWithPrecision(
+                    displayValue,
+                    displayCandidate.significantDigits,
+                )}`
+            }
+            return ""
+        }
+        default:
+            return ""
+    }
+}
+
+export const Mod = ({
+    mod,
+    size = "1em",
+    extendedContent,
+    hideNameInTitle = false,
+}: {
+    mod: IMod
+    size?: number | string
+    extendedContent?: string
+    hideNameInTitle?: boolean
+}) => {
+    const modJson = modDetails(mod)
+    const content = extendedContent ?? getExtendedContent(mod)
+    const hasSettings = Object.keys(mod.settings ?? {}).length > 0
+
+    let title = settingsLabel(modJson, mod).join(", ")
+    if (!hideNameInTitle) {
+        title = `${modJson.name}${title === "" ? "" : ` (${title})`}`
+    }
+
+    return (
+        <Tooltip title={title || mod.acronym}>
+            <div
+                className={`mod mod--type-${modJson.type}`}
+                style={{
+                    fontSize: typeof size === "number" ? `${size}px` : size,
+                }}
+            >
                 <div
                     className={`mod__icon mod__icon--${mod.acronym}`}
                     data-acronym={mod.acronym}
-                ></div>
+                />
+                {content !== "" && (
+                    <div className="mod__extender">
+                        <span>{content}</span>
+                    </div>
+                )}
+                {hasSettings && (
+                    <div className="mod__customised-indicator">
+                        <div className="mod__customised-indicator-icon" />
+                    </div>
+                )}
             </div>
         </Tooltip>
     )

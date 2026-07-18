@@ -1,0 +1,70 @@
+/* Ported from osu-web resources/css/bem/score-rank.less
+ * Icons from https://github.com/ppy/osu-web (public/images/badges/score-ranks-v2019)
+ */
+
+.score-rank {
+  width: 2em;
+  height: 1em;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  display: inline-block;
+  font-size: var(--score-rank-height, 1em);
+}
+
+.score-rank--XH,
+.score-rank--rank-ssh {
+  background-image: url("/images/grades/GradeSmall-SS-Silver.svg");
+}
+
+.score-rank--X,
+.score-rank--rank-ss {
+  background-image: url("/images/grades/GradeSmall-SS.svg");
+}
+
+.score-rank--SH,
+.score-rank--rank-sh {
+  background-image: url("/images/grades/GradeSmall-S-Silver.svg");
+}
+
+.score-rank--S,
+.score-rank--rank-s {
+  background-image: url("/images/grades/GradeSmall-S.svg");
+}
+
+.score-rank--A,
+.score-rank--rank-a {
+  background-image: url("/images/grades/GradeSmall-A.svg");
+}
+
+.score-rank--B,
+.score-rank--rank-b {
+  background-image: url("/images/grades/GradeSmall-B.svg");
+}
+
+.score-rank--C,
+.score-rank--rank-c {
+  background-image: url("/images/grades/GradeSmall-C.svg");
+}
+
+.score-rank--D,
+.score-rank--rank-d {
+  background-image: url("/images/grades/GradeSmall-D.svg");
+}
+
+.score-rank--F,
+.score-rank--rank-f {
+  background-image: url("/images/grades/GradeSmall-F.svg");
+}
+
+.score-rank--tiny {
+  font-size: 14px;
+}
+
+.score-rank--small {
+  font-size: 16px;
+}
+
+.score-rank--medium {
+  font-size: 22px;
+}

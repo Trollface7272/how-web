@@ -19,9 +19,20 @@ export interface IDailyChallengeUser {
     country: string
     streakData: StreakData
     placements: UserPlacements
-    statistics: {
-        total_score: number
-    }
+    statistics: Statistics
+    rankHistory: RankHistory[]
+}
+
+export interface Statistics {
+    totalScore: number
+    accuracy: number
+    pp: number
+    totalPP: number
+}
+
+export interface RankHistory {
+    date: Date
+    rank: number
 }
 
 export interface UserPlacements {

@@ -7,6 +7,7 @@ import {
     CalendarOutlined,
     LoginOutlined,
     LogoutOutlined,
+    OrderedListOutlined,
     TrophyOutlined,
 } from "@ant-design/icons"
 const { Content, Sider } = Layout
@@ -16,6 +17,8 @@ import { IUserContext } from "../models/user.model"
 import { UserContext } from "../context/User"
 import { MenuItemGroupType, MenuItemType } from "antd/es/menu/interface"
 import { useRouter } from "next/router"
+import { PageLoadingBar } from "../components/PageLoadingBar"
+import { PageFade } from "../components/PageFade"
 
 type MenuItem = Required<MenuProps>["items"][number]
 
@@ -40,11 +43,16 @@ const MenuItems: MenuItem[] = [
                 key: "/daily-challenge/leaderboards",
                 icon: <TrophyOutlined />,
             },
+            {
+                label: "Scores",
+                key: "/daily-challenge/scores",
+                icon: <OrderedListOutlined />,
+            },
         ],
     },
 ]
 
-const LoginButton = () => {
+const LoginButton = (): MenuItem => {
     return {
         label: "Login",
         key: "/login",
@@ -54,8 +62,8 @@ const LoginButton = () => {
         },
     }
 }
-const ProfileButton = (collapsed: boolean) => {
-    const user = useContext<IUserContext | null>(UserContext)!
+
+const profileButton = (user: IUserContext, collapsed: boolean): MenuItem => {
     return {
         className: collapsed ? "avatar-collapsed" : "",
         label: user.osu?.username,
@@ -81,7 +89,7 @@ const SideMenu = () => {
 
     const menuItems = useMemo(() => {
         const items = [
-            user?.id ? ProfileButton(collapsed) : LoginButton(),
+            user?.id ? profileButton(user, collapsed) : LoginButton(),
             ...MenuItems,
         ]
         const group = items.find(
@@ -89,7 +97,7 @@ const SideMenu = () => {
         ) as MenuItemGroupType<MenuItemType>
         group!.className = collapsed ? "group-title-text-hidden" : ""
         return items
-    }, [MenuItems, user, collapsed])
+    }, [user, collapsed])
 
     const onClick = (path: string) => {
         if (path === "/login") return
@@ -149,6 +157,7 @@ const App = ({ Component, pageProps }: AppProps) => {
             }
         >
             <ConfigProvider theme={t}>
+                <PageLoadingBar />
                 <Layout style={{ minHeight: "100vh" }}>
                     <SideMenu />
 
@@ -157,7 +166,9 @@ const App = ({ Component, pageProps }: AppProps) => {
                         style={{ overflowY: "scroll", overflowX: "hidden" }}
                     >
                         <Content style={{ margin: "0 16px" }}>
-                            <Component {...pageProps} />
+                            <PageFade>
+                                <Component {...pageProps} />
+                            </PageFade>
                         </Content>
                     </Layout>
                 </Layout>

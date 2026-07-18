@@ -42,7 +42,8 @@ export interface GetLeaderboardsResponse {
         | "top100.count"
     >
     statistics: {
-        total_score: number
+        totalScore: number
+        pp: number
     }
 }
 
@@ -71,6 +72,17 @@ export interface GetUserResponse {
     }[]
     averagePlacement: number
     averagePlacementPercent: number
+    statistics: {
+        totalScore: number
+        accuracy: number
+        pp: number
+        totalPP: number
+    }
+    ppRank: number | null
+    rankHistory: {
+        date: string
+        rank: number
+    }[]
 }
 
 export interface DailyChallengeData {

@@ -29,20 +29,10 @@ const userSchema = new Schema<IDailyChallenge>({
         owner_id: { type: Number, required: true },
         playlist_order: { type: Schema.Types.Mixed, default: null },
         played_at: { type: Date, default: null },
+        // Full osu! beatmap payload (includes beatmapset); keep Mixed so nested fields aren't stripped
         beatmap: {
-            beatmapset_id: { type: Number, required: true },
-            difficulty_rating: { type: Number, required: true },
-            id: { type: Number, required: true },
-            mode: { type: String, required: true },
-            status: { type: String, required: true },
-            total_length: { type: Number, required: true },
-            user_id: { type: Number, required: true },
-            version: { type: String, required: true },
-            accuracy: { type: Number, default: 0.0 },
-            ar: { type: Number, default: 0.0 },
-            bpm: { type: Number, default: 0.0 },
-            convert: { type: Boolean, default: false },
-            count_circles: { type: Number, default: null },
+            type: Schema.Types.Mixed,
+            required: true,
         },
     },
     difficulty_range: {

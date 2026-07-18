@@ -1,132 +1,435 @@
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css");
+/* Ported from osu-web resources/css/bem/mod.less
+ * Icons from https://github.com/ppy/osu-web (public/images/badges/mods)
+ */
 
 :root {
   --mod-height: 1em;
-  --hsl-lime-1: 90, 100%, 70%;
-  --hsl-red-1: 360, 100%, 70%;
-  --hsl-purple-1: 255, 100%, 70%;
-  --hsl-blue-1: 200, 100%, 70%;
-  --hsl-pink-1: 333, 100%, 70%;
+  --osu-colour-lime-1: hsl(90, 100%, 70%);
+  --osu-colour-red-1: hsl(360, 100%, 70%);
+  --osu-colour-purple-1: hsl(255, 100%, 70%);
+  --osu-colour-blue-1: hsl(200, 100%, 70%);
+  --osu-colour-pink-1: hsl(333, 100%, 70%);
+  --osu-colour-yellow: #fc2;
 }
 
 .mod {
-  font-size: var(--mod-height,);
+  font-size: var(--mod-height);
+  --icon-width: 1.42em;
   height: 1em;
   display: flex;
   position: relative;
 }
 
 .mod--type-Automation {
-  --type-bg-colour: hsl(var(--hsl-blue-1));
-  --type-fg-colour: color-mix(in srgb-linear, #000, hsl(var(--hsl-blue-1)) 10%);
+  --type-bg-colour: var(--osu-colour-blue-1);
+  --type-fg-colour: color-mix(
+    in srgb-linear,
+    #000,
+    var(--osu-colour-blue-1) 10%
+  );
   --type-extender-colour: color-mix(
     in srgb,
     #000,
-    hsl(var(--hsl-blue-1)) 26.3%
+    var(--osu-colour-blue-1) 26.3%
   );
 }
 
 .mod--type-Conversion {
-  --type-bg-colour: hsl(var(--hsl-purple-1));
+  --type-bg-colour: var(--osu-colour-purple-1);
   --type-fg-colour: color-mix(
     in srgb-linear,
     #000,
-    hsl(var(--hsl-purple-1)) 10%
+    var(--osu-colour-purple-1) 10%
   );
   --type-extender-colour: color-mix(
     in srgb,
     #000,
-    hsl(var(--hsl-purple-1)) 26.3%
+    var(--osu-colour-purple-1) 26.3%
   );
 }
 
 .mod--type-DifficultyIncrease {
-  --type-bg-colour: hsl(var(--hsl-red-1));
-  --type-fg-colour: color-mix(in srgb-linear, #000, hsl(var(--hsl-red-1)) 10%);
-  --type-extender-colour: color-mix(in srgb, #000, hsl(var(--hsl-red-1)) 26.3%);
-}
-
-.mod--type-DifficultyReduction {
-  --type-bg-colour: hsl(var(--hsl-lime-1));
-  --type-fg-colour: color-mix(in srgb-linear, #000, hsl(var(--hsl-lime-1)) 10%);
+  --type-bg-colour: var(--osu-colour-red-1);
+  --type-fg-colour: color-mix(
+    in srgb-linear,
+    #000,
+    var(--osu-colour-red-1) 10%
+  );
   --type-extender-colour: color-mix(
     in srgb,
     #000,
-    hsl(var(--hsl-lime-1)) 26.3%
+    var(--osu-colour-red-1) 26.3%
+  );
+}
+
+.mod--type-DifficultyReduction {
+  --type-bg-colour: var(--osu-colour-lime-1);
+  --type-fg-colour: color-mix(
+    in srgb-linear,
+    #000,
+    var(--osu-colour-lime-1) 10%
+  );
+  --type-extender-colour: color-mix(
+    in srgb,
+    #000,
+    var(--osu-colour-lime-1) 26.3%
   );
 }
 
 .mod--type-Fun {
-  --type-bg-colour: hsl(var(--hsl-pink-1));
-  --type-fg-colour: color-mix(in srgb-linear, #000, hsl(var(--hsl-pink-1)) 10%);
+  --type-bg-colour: var(--osu-colour-pink-1);
+  --type-fg-colour: color-mix(
+    in srgb-linear,
+    #000,
+    var(--osu-colour-pink-1) 10%
+  );
   --type-extender-colour: color-mix(
     in srgb,
     #000,
-    hsl(var(--hsl-pink-1)) 26.3%
+    var(--osu-colour-pink-1) 26.3%
   );
 }
 
 .mod--type-System {
-  --type-bg-colour: #fc2;
-  --type-fg-colour: color-mix(in srgb-linear, #000, #fc2 10%);
-  --type-extender-colour: color-mix(in srgb, #000, #fc2 26.3%);
+  --type-bg-colour: var(--osu-colour-yellow);
+  --type-fg-colour: color-mix(
+    in srgb-linear,
+    #000,
+    var(--osu-colour-yellow) 10%
+  );
+  --type-extender-colour: color-mix(
+    in srgb,
+    #000,
+    var(--osu-colour-yellow) 26.3%
+  );
 }
 
 .mod__icon {
   position: relative;
-  width: 1.42em;
+  width: var(--icon-width);
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-.mod__icon::before,
-.mod__icon::after {
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-}
-
 .mod__icon::before {
+  position: absolute;
+  inset: 0;
   background-color: var(--type-bg-colour);
-  mask-image: url("/images/mods/mod-icon.svg");
+  -webkit-mask-image: url("/images/mods/blanks/mod-icon.svg");
+  mask-image: url("/images/mods/blanks/mod-icon.svg");
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
-  content: " ";
-  display: flex;
+  content: "";
+  display: block;
 }
 
 .mod__icon::after {
+  position: absolute;
+  inset: 0;
   content: attr(data-acronym);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--type-fg-colour);
-  font-family: "Font Awesome 5 Free";
   font-weight: 900;
   font-size: 0.4em;
+}
+
+.mod__icon--10K::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-ten-keys.svg");
+  mask-image: url("/images/mods/mod-ten-keys.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--1K::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-one-key.svg");
+  mask-image: url("/images/mods/mod-one-key.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--2K::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-two-keys.svg");
+  mask-image: url("/images/mods/mod-two-keys.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--3K::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-three-keys.svg");
+  mask-image: url("/images/mods/mod-three-keys.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--4K::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-four-keys.svg");
+  mask-image: url("/images/mods/mod-four-keys.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--5K::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-five-keys.svg");
+  mask-image: url("/images/mods/mod-five-keys.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--6K::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-six-keys.svg");
+  mask-image: url("/images/mods/mod-six-keys.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--7K::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-seven-keys.svg");
+  mask-image: url("/images/mods/mod-seven-keys.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--8K::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-eight-keys.svg");
+  mask-image: url("/images/mods/mod-eight-keys.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--9K::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-nine-keys.svg");
+  mask-image: url("/images/mods/mod-nine-keys.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--AC::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-accuracy-challenge.svg");
+  mask-image: url("/images/mods/mod-accuracy-challenge.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--AD::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-approach-different.svg");
+  mask-image: url("/images/mods/mod-approach-different.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--AL::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-alternate.svg");
+  mask-image: url("/images/mods/mod-alternate.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
 }
 
 .mod__icon--AP::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/autopilot.svg");
+  -webkit-mask-image: url("/images/mods/mod-autopilot.svg");
+  mask-image: url("/images/mods/mod-autopilot.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
-  z-index: 1;
+}
+
+.mod__icon--AS::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-adaptive-speed.svg");
+  mask-image: url("/images/mods/mod-adaptive-speed.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
 }
 
 .mod__icon--AT::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/autoplay.svg");
+  -webkit-mask-image: url("/images/mods/mod-autoplay.svg");
+  mask-image: url("/images/mods/mod-autoplay.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--BL::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-blinds.svg");
+  mask-image: url("/images/mods/mod-blinds.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--BM::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-bloom.svg");
+  mask-image: url("/images/mods/mod-bloom.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--BR::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-barrel-roll.svg");
+  mask-image: url("/images/mods/mod-barrel-roll.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--BU::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-bubbles.svg");
+  mask-image: url("/images/mods/mod-bubbles.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--CL::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-classic.svg");
+  mask-image: url("/images/mods/mod-classic.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
@@ -134,9 +437,111 @@
 .mod__icon--CN::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/cinema.svg");
+  -webkit-mask-image: url("/images/mods/mod-cinema.svg");
+  mask-image: url("/images/mods/mod-cinema.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--CO::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-cover.svg");
+  mask-image: url("/images/mods/mod-cover.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--CS::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-constant-speed.svg");
+  mask-image: url("/images/mods/mod-constant-speed.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--DA::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-difficulty-adjust.svg");
+  mask-image: url("/images/mods/mod-difficulty-adjust.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--DC::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-daycore.svg");
+  mask-image: url("/images/mods/mod-daycore.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--DF::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-deflate.svg");
+  mask-image: url("/images/mods/mod-deflate.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--DP::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-depth.svg");
+  mask-image: url("/images/mods/mod-depth.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--DS::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-dual-stages.svg");
+  mask-image: url("/images/mods/mod-dual-stages.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
@@ -144,9 +549,13 @@
 .mod__icon--DT::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/double-time.svg");
+  -webkit-mask-image: url("/images/mods/mod-double-time.svg");
+  mask-image: url("/images/mods/mod-double-time.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
@@ -154,9 +563,41 @@
 .mod__icon--EZ::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/easy.svg");
+  -webkit-mask-image: url("/images/mods/mod-easy.svg");
+  mask-image: url("/images/mods/mod-easy.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--FF::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-floating-fruits.svg");
+  mask-image: url("/images/mods/mod-floating-fruits.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--FI::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-fade-in.svg");
+  mask-image: url("/images/mods/mod-fade-in.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
@@ -164,29 +605,41 @@
 .mod__icon--FL::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/flashlight.svg");
+  -webkit-mask-image: url("/images/mods/mod-flashlight.svg");
+  mask-image: url("/images/mods/mod-flashlight.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
 
-.mod__icon--HT::after {
+.mod__icon--FR::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/half-time.svg");
+  -webkit-mask-image: url("/images/mods/mod-freeze-frame.svg");
+  mask-image: url("/images/mods/mod-freeze-frame.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
 
-.mod__icon--HR::after {
+.mod__icon--GR::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/hard-rock.svg");
+  -webkit-mask-image: url("/images/mods/mod-grow.svg");
+  mask-image: url("/images/mods/mod-grow.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
@@ -194,9 +647,125 @@
 .mod__icon--HD::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/hidden.svg");
+  -webkit-mask-image: url("/images/mods/mod-hidden.svg");
+  mask-image: url("/images/mods/mod-hidden.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--HO::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-hold-off.svg");
+  mask-image: url("/images/mods/mod-hold-off.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--HR::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-hard-rock.svg");
+  mask-image: url("/images/mods/mod-hard-rock.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--HT::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-half-time.svg");
+  mask-image: url("/images/mods/mod-half-time.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--IN::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-invert.svg");
+  mask-image: url("/images/mods/mod-invert.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--MF::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-moving-fast.svg");
+  mask-image: url("/images/mods/mod-moving-fast.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--MG::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-magnetised.svg");
+  mask-image: url("/images/mods/mod-magnetised.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--MR::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-mirror.svg");
+  mask-image: url("/images/mods/mod-mirror.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--MU::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-muted.svg");
+  mask-image: url("/images/mods/mod-muted.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
@@ -204,9 +773,13 @@
 .mod__icon--NC::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/  .svg");
+  -webkit-mask-image: url("/images/mods/mod-nightcore.svg");
+  mask-image: url("/images/mods/mod-nightcore.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
@@ -214,9 +787,55 @@
 .mod__icon--NF::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/no-fail.svg");
+  -webkit-mask-image: url("/images/mods/mod-no-fail.svg");
+  mask-image: url("/images/mods/mod-no-fail.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--NM::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-no-mod.svg");
+  mask-image: url("/images/mods/mod-no-mod.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--NR::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-no-release.svg");
+  mask-image: url("/images/mods/mod-no-release.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--NS::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-no-scope.svg");
+  mask-image: url("/images/mods/mod-no-scope.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
@@ -224,9 +843,13 @@
 .mod__icon--PF::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/perfect.svg");
+  -webkit-mask-image: url("/images/mods/mod-perfect.svg");
+  mask-image: url("/images/mods/mod-perfect.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
@@ -234,9 +857,27 @@
 .mod__icon--RD::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/random.svg");
+  -webkit-mask-image: url("/images/mods/mod-random.svg");
+  mask-image: url("/images/mods/mod-random.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--RP::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-repel.svg");
+  mask-image: url("/images/mods/mod-repel.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
@@ -244,9 +885,13 @@
 .mod__icon--RX::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/relax.svg");
+  -webkit-mask-image: url("/images/mods/mod-relax.svg");
+  mask-image: url("/images/mods/mod-relax.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
@@ -254,9 +899,41 @@
 .mod__icon--SD::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/sudden-death.svg");
+  -webkit-mask-image: url("/images/mods/mod-sudden-death.svg");
+  mask-image: url("/images/mods/mod-sudden-death.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--SG::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-single-tap.svg");
+  mask-image: url("/images/mods/mod-single-tap.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--SI::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-spin-in.svg");
+  mask-image: url("/images/mods/mod-spin-in.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
@@ -264,9 +941,97 @@
 .mod__icon--SO::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/spun-out.svg");
+  -webkit-mask-image: url("/images/mods/mod-spun-out.svg");
+  mask-image: url("/images/mods/mod-spun-out.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--SR::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-simplified-rhythm.svg");
+  mask-image: url("/images/mods/mod-simplified-rhythm.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--ST::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-strict-tracking.svg");
+  mask-image: url("/images/mods/mod-strict-tracking.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--SV2::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-score-v2.svg");
+  mask-image: url("/images/mods/mod-score-v2.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--SW::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-swap.svg");
+  mask-image: url("/images/mods/mod-swap.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--SY::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-synesthesia.svg");
+  mask-image: url("/images/mods/mod-synesthesia.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
+}
+
+.mod__icon--TC::after {
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-traceable.svg");
+  mask-image: url("/images/mods/mod-traceable.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
@@ -274,9 +1039,13 @@
 .mod__icon--TD::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/touch-device.svg");
+  -webkit-mask-image: url("/images/mods/mod-touch-device.svg");
+  mask-image: url("/images/mods/mod-touch-device.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
@@ -284,182 +1053,107 @@
 .mod__icon--TP::after {
   content: "";
   background-color: var(--type-fg-colour);
-  mask-image: url("/images/mods/target-practice.svg");
+  -webkit-mask-image: url("/images/mods/mod-target-practice.svg");
+  mask-image: url("/images/mods/mod-target-practice.svg");
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin: 0;
 }
 
-.mod__icon--AD::after {
-  display: flex;
-  content: "\f111";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--AL::after {
-  display: flex;
-  content: "\f11c";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--BL::after {
-  display: flex;
-  content: "BM";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--CL::after {
-  display: flex;
-  content: "\f1da";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--CS::after {
-  display: flex;
-  content: "CS";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--DA::after {
-  display: flex;
-  content: "\f6e3";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--DF::after {
-  display: flex;
-  content: "\f78c";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--DP::after {
-  display: flex;
-  content: "\f1b2";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--FF::after {
-  display: flex;
-  content: "FF";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--GR::after {
-  display: flex;
-  content: "\f338";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--HO::after {
-  display: flex;
-  content: "HO";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--IN::after {
-  display: flex;
-  content: "IN";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--NM::after {
-  display: flex;
-  content: "\f05e";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--NS::after {
-  display: flex;
-  content: "\f070";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--MG::after {
-  display: flex;
-  content: "\f076";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--MU::after {
-  display: flex;
-  content: "\f6a9";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
-.mod__icon--SI::after {
-  display: flex;
-  content: "\f0e2";
-  font-size: 0.8em;
-  padding-left: 1px;
-}
-
 .mod__icon--TR::after {
-  display: flex;
-  content: "TC";
-  font-size: 0.8em;
-  padding-left: 1px;
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-transform.svg");
+  mask-image: url("/images/mods/mod-transform.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
 }
 
 .mod__icon--WD::after {
-  display: flex;
-  content: "\f13a";
-  font-size: 0.8em;
-  padding-left: 1px;
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-wind-down.svg");
+  mask-image: url("/images/mods/mod-wind-down.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
 }
 
 .mod__icon--WG::after {
-  display: flex;
-  content: "\f0a3";
-  font-size: 0.8em;
-  padding-left: 1px;
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-wiggle.svg");
+  mask-image: url("/images/mods/mod-wiggle.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
 }
 
 .mod__icon--WU::after {
-  display: flex;
-  content: "\f139";
-  font-size: 0.8em;
-  padding-left: 1px;
+  content: "";
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/mod-wind-up.svg");
+  mask-image: url("/images/mods/mod-wind-up.svg");
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  margin: 0;
 }
 
 .mod__customised-indicator {
-  width: 0.35em;
-  height: 0.35em;
-  border-radius: 50%;
-  background-color: var(--type-fg-colour);
   position: absolute;
-  left: 1.05em;
-  top: -0.125em;
+  left: 0;
+  top: calc((1em - var(--icon-width)) / 2);
+  height: calc(var(--icon-width) / 2);
+  width: var(--icon-width);
+  display: grid;
+  pointer-events: none;
 }
 
-.mod__customised-indicator::after {
-  content: "CI";
-  color: var(--type-bg-colour);
-  font-size: 0.2em;
+.mod__customised-indicator-icon {
+  width: 100%;
+  height: 100%;
+  background-color: var(--type-fg-colour);
+  -webkit-mask-image: url("/images/mods/blanks/mod-cog-badge.svg");
+  mask-image: url("/images/mods/blanks/mod-cog-badge.svg");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 
 .mod__extender {
   width: 2.2em;
   background-color: var(--type-extender-colour);
-  mask-image: url("/images/mods/mod-icon-extender.svg");
+  -webkit-mask-image: url("/images/mods/blanks/mod-icon-extender.svg");
+  mask-image: url("/images/mods/blanks/mod-icon-extender.svg");
+  -webkit-mask-size: contain;
   mask-size: contain;
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   margin-left: -0.5em;
   padding-left: 0.5em;

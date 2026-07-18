@@ -122,10 +122,27 @@ const userSchema = new Schema<IDailyChallengeUser>({
         required: true,
     },
     statistics: {
-        type: {
-            total_score: Number,
-        },
+        type: new Schema(
+            {
+                totalScore: Number,
+                accuracy: Number,
+                pp: Number,
+                totalPP: Number,
+            },
+            { _id: false },
+        ),
         required: true,
+    },
+    rankHistory: {
+        type: [
+            new Schema(
+                {
+                    date: Date,
+                    rank: Number,
+                },
+                { _id: false },
+            ),
+        ],
     },
 })
 
